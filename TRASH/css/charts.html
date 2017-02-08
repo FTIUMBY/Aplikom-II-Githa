@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Toko Sepeda</title>
+
+<link href="css/bootstrap.min.css" rel="stylesheet">
+<link href="css/datepicker3.css" rel="stylesheet">
+<link href="css/styles.css" rel="stylesheet">
+
+<!--[if lt IE 9]>
+<script src="js/html5shiv.js"></script>
+<script src="js/respond.min.js"></script>
+<![endif]-->
+
+</head>
+
+<body>
+							
+		
+	<div id="sidebar-collapse" class="col-sm-3 col-lg-2 sidebar">
+		<form role="search">
+			<div class="form-group">
+				<input type="text" class="form-control" placeholder="Search">
+			</div>
+		</form>
+		<ul class="nav menu">
+			<li><a href="index.html"><span class="glyphicon glyphicon"></span> Tambah Data Barang</a></li>
+			<li><a href="widgets.html"><span class="glyphicon glyphicon"></span>Lihat Data Barang</a></li>
+			<li><a href="charts.html"><span class="glyphicon glyphicon"></span>Tambah Kategori</a></li>
+			<li><a href="tables.html"><span class="glyphicon glyphicon"></span> Lihat Kategori</a></li>
+			<li><a href="forms.html"><span class="glyphicon glyphicon"></span>Penjualan Baru</a></li>
+			<li><a href="panels.html"><span class="glyphicon glyphicon"></span> Lihat Data Penjualan</a></li>
+			
+			
+					</li>
+				</ul>
+			</li>
+			<li role="presentation" class="divider"></li>
+			
+	</div><!--/.sidebar-->
+		
+	<div class="col-sm-9 col-sm-offset-3 col-lg-10 col-lg-offset-2 main">			
+		<div class="row">
+			<ol class="breadcrumb">
+				<li><a href="#"><span class="glyphicon glyphicon-home"></span></a></li>
+				<li class="active">Tambah Kategori</li>
+			</ol>
+		</div><!--/.row-->
+		
+		<div class="row">
+			<div class="col-lg-12">
+				<h1 class="page-header">Tambah Kategori</h1>
+				
+			</div>
+		</div><!--/.row-->
+		<?php
+# KONEKSI DATABASE
+// Koneksi ke MySQL
+$koneksidb	= mysql_connect("localhost", "root", "") or die ("Koneksi gagal !");
+// Memilih database pada MySQL
+mysql_select_db("kasir_tokodb", $koneksidb) or die ("Database tidak ditemukan !");
+
+# TOMBOL SIMPAN DIKLIK
+if(isset($_POST['btnSimpan'])){
+	# Membaca data pada form
+	$txtKode	= $_POST['txtKode'];
+	$txtNama	= $_POST['txtNama'];
+	
+	# Validasi data pada form
+	if(trim($txtKode) == "") {
+		echo "Data Kode masih kosong, silahkan diisi.";
+	}
+	elseif(trim($txtNama) == "") {
+		echo "Data Nama Kategori masih kosong, silahkan diisi";
+	}
+	else {
+		// Jika semua form terisi (tidak kosong), maka
+		// Simpan datanya ke database
+		$mySql	= "INSERT INTO kategori (kd_kategori, nm_kategori) VALUES ('$txtKode', '$txtNama')";
+		mysql_query($mySql, $koneksidb) or die ("Error Query".mysql_error()); 
+		
+		// Pesan setelah menyimpan
+		echo "PENYIMPANAN DATA BERHASIL";
+	}
+}
+?>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>Tambah Data Kategori</title>
+</head>
+<body>
+<form action="<?php $_SERVER['PHP_SELF']; ?>" method="post" name="form1" target="_self">
+  <table width="500" border="0" cellspacing="1" cellpadding="3">
+    <tr>
+      <td colspan="2"><strong>TAMBAH DATA KATEGORI </strong></td>
+    </tr>
+    <tr>
+      <td width="133"><strong>Kode</strong></td>
+      <td width="344"><input name="txtKode" type="text" size="10" maxlength="3"></td>
+    </tr>
+    <tr>
+      <td><strong>Nama Kategori </strong></td>
+      <td><input name="txtNama" type="text" size="50" maxlength="100"></td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+      <td><input name="btnSimpan" type="submit" value=" Simpan "></td>
+    </tr>
+  </table>
+</form>
+</body>
+</html>
+
+			</div>
+		</div><!--/.row-->
+											
+	</div>	<!--/.main-->
+	  
+
+	<script src="js/jquery-1.11.1.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+	<script src="js/chart.min.js"></script>
+	<script src="js/chart-data.js"></script>
+	<script src="js/easypiechart.js"></script>
+	<script src="js/easypiechart-data.js"></script>
+	<scrip	t src="js/bootstrap-datepicker.js"></script>
+	<script>
+		!function ($) {
+		    $(document).on("click","ul.nav li.parent > a > span.icon", function(){          
+		        $(this).find('em:first').toggleClass("glyphicon-minus");      
+		    }); 
+		    $(".sidebar span.icon").find('em:first').addClass("glyphicon-plus");
+		}(window.jQuery);
+
+		$(window).on('resize', function () {
+		  if ($(window).width() > 768) $('#sidebar-collapse').collapse('show')
+		})
+		$(window).on('resize', function () {
+		  if ($(window).width() <= 767) $('#sidebar-collapse').collapse('hide')
+		})
+	</script>	
+</body>
+
+</html>
