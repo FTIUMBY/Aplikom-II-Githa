@@ -22,14 +22,12 @@ class SiteController extends Controller
 	}
 
 	/**
-	 * This is the default 'index' action that is invoked
-	 * when an action is not explicitly requested by users.
+	 * Initialize admin page theme
 	 */
-	public function actionIndex()
+	public function init() 
 	{
-		// renders the view file 'protected/views/site/index.php'
-		// using the default layout 'protected/views/layouts/main.php'
-		$this->render('index');
+		Yii::app()->theme = 'xxxxxxxxxxxxxxx';
+		$this->layout = 'front_default';
 	}
 
 	/**
@@ -44,6 +42,83 @@ class SiteController extends Controller
 			else
 				$this->render('error', $error);
 		}
+	}
+
+	/**
+	 * This is the default 'index' action that is invoked
+	 * when an action is not explicitly requested by users.
+	 */
+	public function actionIndex()
+	{
+		// renders the view file 'protected/views/site/index.php'
+		// using the default layout 'protected/views/layouts/main.php'
+		$this->render('index');
+	}
+
+	/**
+	 * Displays the login page
+	 */
+	public function actionLogin()
+	{
+		Yii::app()->theme = 'ommu';
+		$this->layout = 'admin_default';
+		
+		if(!Yii::app()->user->isGuest)
+			$this->redirect(Yii::app()->createUrl('admin/index'));
+
+		else {		
+			$model=new LoginForm;
+
+			// if it is ajax validation request
+			if(isset($_POST['ajax']) && $_POST['ajax']==='login-form') {
+				echo CActiveForm::validate($model);
+				Yii::app()->end();
+			}
+
+			// collect user input data
+			if(isset($_POST['LoginForm']))
+			{
+				$model->attributes=$_POST['LoginForm'];
+
+				$jsonError = CActiveForm::validate($model);
+				if(strlen($jsonError) > 2) {
+					echo $jsonError;
+
+				} else {
+					if(isset($_GET['enablesave']) && $_GET['enablesave'] == 1) {
+						// validate user input and redirect to the previous page if valid
+						if($model->validate() && $model->login()) {
+							echo CJSON::encode(array(
+								'redirect' => Yii::app()->user->level == 1 ? Yii::app()->createUrl('admin/index') : Yii::app()->user->returnUrl,
+							));
+							//$this->redirect(Yii::app()->user->returnUrl);
+						} else
+							print_r($model->getErrors());
+					}
+				}
+				Yii::app()->end();
+			}
+			
+			// display the login form
+			$this->dialogDetail = true;
+			$this->dialogWidth = 600;
+			
+			$this->pageTitle = Yii::t('phrase', 'Login');
+			$this->pageDescription = '';
+			$this->pageMeta = '';
+			$this->render('front_login',array(
+				'model'=>$model,
+			));
+		}
+	}
+
+	/**
+	 * Logs out the current user and redirect to homepage.
+	 */
+	public function actionLogout()
+	{
+		Yii::app()->user->logout();
+		$this->redirect(Yii::app()->homeUrl);
 	}
 
 	/**
@@ -70,40 +145,5 @@ class SiteController extends Controller
 			}
 		}
 		$this->render('contact',array('model'=>$model));
-	}
-
-	/**
-	 * Displays the login page
-	 */
-	public function actionLogin()
-	{
-		$model=new LoginForm;
-
-		// if it is ajax validation request
-		if(isset($_POST['ajax']) && $_POST['ajax']==='login-form')
-		{
-			echo CActiveForm::validate($model);
-			Yii::app()->end();
-		}
-
-		// collect user input data
-		if(isset($_POST['LoginForm']))
-		{
-			$model->attributes=$_POST['LoginForm'];
-			// validate user input and redirect to the previous page if valid
-			if($model->validate() && $model->login())
-				$this->redirect(Yii::app()->user->returnUrl);
-		}
-		// display the login form
-		$this->render('login',array('model'=>$model));
-	}
-
-	/**
-	 * Logs out the current user and redirect to homepage.
-	 */
-	public function actionLogout()
-	{
-		Yii::app()->user->logout();
-		$this->redirect(Yii::app()->homeUrl);
 	}
 }

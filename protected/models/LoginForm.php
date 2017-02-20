@@ -10,7 +10,6 @@ class LoginForm extends CFormModel
 	public $username;
 	public $password;
 	public $rememberMe;
-
 	private $_identity;
 
 	/**
@@ -25,8 +24,10 @@ class LoginForm extends CFormModel
 			array('username, password', 'required'),
 			// rememberMe needs to be a boolean
 			array('rememberMe', 'boolean'),
+            array('username', 'length', 'max'=>32),
 			// password needs to be authenticated
 			array('password', 'authenticate'),
+			array('username, password', 'safe'),
 		);
 	}
 
@@ -36,7 +37,9 @@ class LoginForm extends CFormModel
 	public function attributeLabels()
 	{
 		return array(
-			'rememberMe'=>'Remember me next time',
+			'username' => Yii::t('attribute', 'Username'),
+			'password' => Yii::t('attribute', 'Password'),
+			'rememberMe' => Yii::t('attribute', 'Remember me next time'),
 		);
 	}
 
@@ -46,11 +49,24 @@ class LoginForm extends CFormModel
 	 */
 	public function authenticate($attribute,$params)
 	{
+		// we only want to authenticate when no input errors
 		if(!$this->hasErrors())
 		{
 			$this->_identity=new UserIdentity($this->username,$this->password);
-			if(!$this->_identity->authenticate())
-				$this->addError('password','Incorrect username or password.');
+			$this->_identity->authenticate();
+
+			switch($this->_identity->errorCode)
+			{
+				case UserIdentity::ERROR_NONE:
+					Yii::app()->user->login($this->_identity);
+					break;
+				case UserIdentity::ERROR_USERNAME_INVALID:
+					$this->addError('username', Yii::t('phrase', 'Username is incorrect.'));
+					break;
+				default: //UserIdentity::ERROR_PASSWORD_INVALID
+					$this->addError('password', Yii::t('phrase', 'Password is incorrect.'));
+					break;				
+			}
 		}
 	}
 
