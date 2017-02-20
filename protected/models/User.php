@@ -304,7 +304,7 @@ class User extends CActiveRecord
 			if(!isset($_GET['type'])) {
 				$this->defaultColumns[] = array(
 					'name' => 'status',
-					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("status",array("id"=>$data->user_id)), $data->status, 1)',
+					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("publish",array("id"=>$data->user_id)), $data->status)',
 					'htmlOptions' => array(
 						'class' => 'center',
 					),
