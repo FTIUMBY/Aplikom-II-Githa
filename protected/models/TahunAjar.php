@@ -3,12 +3,6 @@
  * TahunAjar
  * version: 0.0.1
  *
- * @author Putra Sudaryanto <putra@sudaryanto.id>
- * @copyright Copyright (c) 2016 Ommu Platform (ommu.co)
- * @created date 20 February 2017, 23:17 WIB
- * @link http://company.ommu.co
- * @contact (+62)856-299-4114
- *
  * This is the template for generating the model class of a specified table.
  * - $this: the ModelCode object
  * - $tableName: the table name for this class (prefix is already removed if necessary)
@@ -24,6 +18,7 @@
  *
  * The followings are the available columns in table 'tbl_tahun_ajar':
  * @property integer $tahun_ajar_id
+ * @property integer $status
  * @property string $tahun_ajar
  * @property string $creation_date
  * @property integer $creation_id
@@ -36,6 +31,10 @@
 class TahunAjar extends CActiveRecord
 {
 	public $defaultColumns = array();
+	
+	// Variable Search
+	public $creation_search;
+	public $modified_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -64,13 +63,14 @@ class TahunAjar extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('tahun_ajar, creation_date, creation_id, modified_id', 'required'),
-			array('creation_id, modified_id', 'numerical', 'integerOnly'=>true),
+			array('tahun_ajar', 'required'),
+			array('status, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
 			array('tahun_ajar', 'length', 'max'=>9),
-			array('modified_date', 'safe'),
+			array('', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('tahun_ajar_id, tahun_ajar, creation_date, creation_id, modified_date, modified_id', 'safe', 'on'=>'search'),
+			array('tahun_ajar_id, status, tahun_ajar, creation_date, creation_id, modified_date, modified_id,
+				creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -83,6 +83,8 @@ class TahunAjar extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'tblPegawais_relation' => array(self::HAS_MANY, 'TblPegawai', 'tahun_ajar_id'),
+			'creation' => array(self::BELONGS_TO, 'User', 'creation_id'),
+			'modified' => array(self::BELONGS_TO, 'User', 'modified_id'),
 		);
 	}
 
@@ -93,14 +95,18 @@ class TahunAjar extends CActiveRecord
 	{
 		return array(
 			'tahun_ajar_id' => Yii::t('attribute', 'Tahun Ajar'),
+			'status' => Yii::t('attribute', 'Status'),
 			'tahun_ajar' => Yii::t('attribute', 'Tahun Ajar'),
 			'creation_date' => Yii::t('attribute', 'Creation Date'),
 			'creation_id' => Yii::t('attribute', 'Creation'),
 			'modified_date' => Yii::t('attribute', 'Modified Date'),
 			'modified_id' => Yii::t('attribute', 'Modified'),
+			'creation_search' => Yii::t('attribute', 'Creation'),
+			'modified_search' => Yii::t('attribute', 'Modified'),
 		);
 		/*
 			'Tahun Ajar' => 'Tahun Ajar',
+			'Status' => 'Status',
 			'Tahun Ajar' => 'Tahun Ajar',
 			'Creation Date' => 'Creation Date',
 			'Creation' => 'Creation',
@@ -127,8 +133,21 @@ class TahunAjar extends CActiveRecord
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
 		$criteria=new CDbCriteria;
+		
+		// Custom Search
+		$criteria->with = array(
+			'creation' => array(
+				'alias'=>'creation',
+				'select'=>'displayname'
+			),
+			'modified' => array(
+				'alias'=>'modified',
+				'select'=>'displayname'
+			),
+		);
 
 		$criteria->compare('t.tahun_ajar_id',$this->tahun_ajar_id);
+		$criteria->compare('t.status',$this->status);
 		$criteria->compare('t.tahun_ajar',strtolower($this->tahun_ajar),true);
 		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
 			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
@@ -142,6 +161,9 @@ class TahunAjar extends CActiveRecord
 			$criteria->compare('t.modified_id',$_GET['modified']);
 		else
 			$criteria->compare('t.modified_id',$this->modified_id);
+		
+		$criteria->compare('creation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('modified.displayname',strtolower($this->modified_search), true);
 
 		if(!isset($_GET['TahunAjar_sort']))
 			$criteria->order = 't.tahun_ajar_id DESC';
@@ -173,6 +195,7 @@ class TahunAjar extends CActiveRecord
 			}
 		} else {
 			//$this->defaultColumns[] = 'tahun_ajar_id';
+			$this->defaultColumns[] = 'status';
 			$this->defaultColumns[] = 'tahun_ajar';
 			$this->defaultColumns[] = 'creation_date';
 			$this->defaultColumns[] = 'creation_id';
@@ -202,6 +225,10 @@ class TahunAjar extends CActiveRecord
 			);
 			$this->defaultColumns[] = 'tahun_ajar';
 			$this->defaultColumns[] = array(
+				'name' => 'creation_search',
+				'value' => '$data->creation->displayname',
+			);
+			$this->defaultColumns[] = array(
 				'name' => 'creation_date',
 				'value' => 'Utility::dateFormat($data->creation_date)',
 				'htmlOptions' => array(
@@ -227,34 +254,20 @@ class TahunAjar extends CActiveRecord
 					),
 				), true),
 			);
-			$this->defaultColumns[] = 'creation_id';
-			$this->defaultColumns[] = array(
-				'name' => 'modified_date',
-				'value' => 'Utility::dateFormat($data->modified_date)',
-				'htmlOptions' => array(
-					'class' => 'center',
-				),
-				'filter' => Yii::app()->controller->widget('zii.widgets.jui.CJuiDatePicker', array(
-					'model'=>$this,
-					'attribute'=>'modified_date',
-					'language' => 'ja',
-					'i18nScriptFile' => 'jquery.ui.datepicker-en.js',
-					//'mode'=>'datetime',
+			if(!isset($_GET['type'])) {
+				$this->defaultColumns[] = array(
+					'name' => 'status',
+					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("status",array("id"=>$data->tahun_ajar_id)), $data->status, 1)',
 					'htmlOptions' => array(
-						'id' => 'modified_date_filter',
+						'class' => 'center',
 					),
-					'options'=>array(
-						'showOn' => 'focus',
-						'dateFormat' => 'dd-mm-yy',
-						'showOtherMonths' => true,
-						'selectOtherMonths' => true,
-						'changeMonth' => true,
-						'changeYear' => true,
-						'showButtonPanel' => true,
+					'filter'=>array(
+						1=>Yii::t('phrase', 'Yes'),
+						0=>Yii::t('phrase', 'No'),
 					),
-				), true),
-			);
-			$this->defaultColumns[] = 'modified_id';
+					'type' => 'raw',
+				);
+			}
 		}
 		parent::afterConstruct();
 	}
@@ -279,69 +292,14 @@ class TahunAjar extends CActiveRecord
 	/**
 	 * before validate attributes
 	 */
-	/*
 	protected function beforeValidate() {
-		if(parent::beforeValidate()) {
-			// Create action
+		if(parent::beforeValidate()) {	
+			if($this->isNewRecord)
+				$this->creation_id = Yii::app()->user->id;			
+			else
+				$this->modified_id = Yii::app()->user->id;
 		}
 		return true;
 	}
-	*/
-
-	/**
-	 * after validate attributes
-	 */
-	/*
-	protected function afterValidate()
-	{
-		parent::afterValidate();
-			// Create action
-		return true;
-	}
-	*/
-	
-	/**
-	 * before save attributes
-	 */
-	/*
-	protected function beforeSave() {
-		if(parent::beforeSave()) {
-			//$this->modified_date = date('Y-m-d', strtotime($this->modified_date));
-		}
-		return true;	
-	}
-	*/
-	
-	/**
-	 * After save attributes
-	 */
-	/*
-	protected function afterSave() {
-		parent::afterSave();
-		// Create action
-	}
-	*/
-
-	/**
-	 * Before delete attributes
-	 */
-	/*
-	protected function beforeDelete() {
-		if(parent::beforeDelete()) {
-			// Create action
-		}
-		return true;
-	}
-	*/
-
-	/**
-	 * After delete attributes
-	 */
-	/*
-	protected function afterDelete() {
-		parent::afterDelete();
-		// Create action
-	}
-	*/
 
 }

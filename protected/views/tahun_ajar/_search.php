@@ -6,12 +6,6 @@
  * @var $form CActiveForm
  * version: 0.0.1
  *
- * @author Putra Sudaryanto <putra@sudaryanto.id>
- * @copyright Copyright (c) 2017 Ommu Platform (ommu.co)
- * @created date 20 February 2017, 23:18 WIB
- * @link http://company.ommu.co
- * @contect (+62)856-299-4114
- *
  */
 ?>
 
@@ -23,6 +17,11 @@
 		<li>
 			<?php echo $model->getAttributeLabel('tahun_ajar_id'); ?><br/>
 			<?php echo $form->textField($model,'tahun_ajar_id'); ?>
+		</li>
+
+		<li>
+			<?php echo $model->getAttributeLabel('status'); ?><br/>
+			<?php echo $form->textField($model,'status'); ?>
 		</li>
 
 		<li>
