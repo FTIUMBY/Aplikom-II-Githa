@@ -18,40 +18,46 @@ return array(
 		'application.components.*',
 	),
 
-	'modules'=>array(
-		// uncomment the following to enable the Gii tool
-		/*
-		'gii'=>array(
-			'class'=>'system.gii.GiiModule',
-			'password'=>'Enter Your Password Here',
-			// If removed, Gii defaults to localhost only. Edit carefully to taste.
-			'ipFilters'=>array('127.0.0.1','::1'),
-		),
-		*/
-	),
-
 	// application components
 	'components'=>array(
+
+		// uncomment the following to enable URLs in path-format
+		'urlManager'=>array(
+			'urlFormat'=>'path',
+			'rules'=>array(
+				//a standard rule mapping '/' to 'site/index' action
+				'' 																	=> 'site/index',
+				
+				//a standard rule mapping '/login' to 'site/login', and so on
+				'<action:(login|logout)>' 											=> 'site/<action>',
+				'<id:\d+>-<t:[\w\-]+>/<static:[\w\-]+>-<picture:[\w\-]+>'			=> 'page/view',
+				'<id:\d+>-<t:[\w\-]+>'												=> 'page/view',
+			
+				'<controller:\w+>/<t:[\w\-]+>-<id:\d+>/<photo:\d+>'					=> '<controller>/view',
+				'<controller:\w+>/<t:[\w\-]+>-<id:\d+>'								=> '<controller>/view',
+				'<controller:\w+>/<id:\d+>'											=> '<controller>/view',
+				
+				//controller condition
+				'<controller:\w+>/<t:[\w\-]+>-<id:\d+>/<category:\d+>'				=> '<controller>/index',			
+				'<controller:\w+>/<t:[\w\-]+>/<category:\d+>'						=> '<controller>/index',
+				'<controller:\w+>/<t:[\w\-]+>-<id:\d+>'								=> '<controller>/index',
+				'<controller:\w+>/<id:\d+>'											=> '<controller>/index',
+				'<controller:\w+>'													=> '<controller>/index',
+				
+				//'<controller:\w+>/<action:\w+>/<t:[\w\-]+>-<id:\d+>'				=> '<controller>/<action>',
+				//'<controller:\w+>/<action:\w+>/<id:\d+>'							=> '<controller>/<action>',
+				'<controller:\w+>/<action:\w+>'										=> '<controller>/<action>',
+				'<controller:\w+>'													=> '<controller>', 
+			),
+		),
+
+		// database settings are configured in database.php
+		'db'=>require(dirname(__FILE__).'/database.php'),
 
 		'user'=>array(
 			// enable cookie-based authentication
 			'allowAutoLogin'=>true,
 		),
-
-		// uncomment the following to enable URLs in path-format
-		/*
-		'urlManager'=>array(
-			'urlFormat'=>'path',
-			'rules'=>array(
-				'<controller:\w+>/<id:\d+>'=>'<controller>/view',
-				'<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
-				'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
-			),
-		),
-		*/
-
-		// database settings are configured in database.php
-		'db'=>require(dirname(__FILE__).'/database.php'),
 
 		'errorHandler'=>array(
 			// use 'site/error' action to display errors
