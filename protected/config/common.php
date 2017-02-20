@@ -16,6 +16,7 @@ return array(
 	'import'=>array(
 		'application.models.*',
 		'application.components.*',
+		'application.components.system.*',
 	),
 	
 	'modules'=>array(
@@ -30,6 +31,11 @@ return array(
 
 	// application components
 	'components'=>array(
+
+		'clientScript' => array(
+			'class' => 'OClientScript',
+			'coreScriptPosition' => CClientScript::POS_END,
+		),
 
 		// uncomment the following to enable URLs in path-format
 		'urlManager'=>array(
@@ -102,5 +108,7 @@ return array(
 	'params'=>array(
 		// this is used in contact page
 		'adminEmail'=>'webmaster@example.com',
+		'site_dateformat'=>'j F Y',
+		'site_timeformat'=>'H:i',
 	),
 );

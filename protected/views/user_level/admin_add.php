@@ -20,6 +20,4 @@
 	);
 ?>
 
-<div class="form">
-	<?php echo $this->renderPartial('/user_level/_form', array('model'=>$model)); ?>
-</div>
+<?php echo $this->renderPartial('/user_level/_form', array('model'=>$model)); ?>
