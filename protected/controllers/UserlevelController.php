@@ -38,9 +38,6 @@ class UserlevelController extends Controller
 	 */
 	public function init() 
 	{
-		Yii::app()->theme = 'ommu';
-		$this->layout = 'admin_default';
-		/*
 		if(!Yii::app()->user->isGuest) {
 			if(Yii::app()->user->level == 1) {
 				Yii::app()->theme = 'ommu';
@@ -49,7 +46,6 @@ class UserlevelController extends Controller
 				throw new CHttpException(404, Yii::t('phrase', 'The requested page does not exist.'));
 		} else
 			$this->redirect(Yii::app()->createUrl('site/login'));
-		*/
 	}
 
 	/**
@@ -72,7 +68,7 @@ class UserlevelController extends Controller
 	{
 		return array(
 			array('allow',  // allow all users to perform 'index' and 'view' actions
-				'actions'=>array('index','manage','add','edit','view','runaction','delete','publish'),
+				'actions'=>array('index'),
 				'users'=>array('*'),
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
@@ -82,7 +78,7 @@ class UserlevelController extends Controller
 				//'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level != 1)',
 			),
 			array('allow', // allow authenticated user to perform 'create' and 'update' actions
-				'actions'=>array(),
+				'actions'=>array('manage','add','edit','view','runaction','delete','publish'),
 				'users'=>array('@'),
 				'expression'=>'isset(Yii::app()->user->level) && (Yii::app()->user->level == 1)',
 			),
