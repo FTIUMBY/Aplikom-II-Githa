@@ -10,14 +10,6 @@ if(isset($_GET['protocol']) && $_GET['protocol'] == 'script') {
 	$currentAction = strtolower(Yii::app()->controller->id.'/'.Yii::app()->controller->action->id);
 	$currentModule = strtolower(Yii::app()->controller->module->id.'/'.Yii::app()->controller->id);
 	$currentModuleAction = strtolower(Yii::app()->controller->module->id.'/'.Yii::app()->controller->id.'/'.Yii::app()->controller->action->id);
-	
-	/**
-	 * = Global condition
-	 ** Construction condition
-	 */
-	$setting = OmmuSettings::model()->findByPk(1,array(
-		'select' => 'site_title',
-	));
 
 	/**
 	 * = Dialog Condition
@@ -32,7 +24,7 @@ if(isset($_GET['protocol']) && $_GET['protocol'] == 'script') {
 	/**
 	 * = pushState condition
 	 */
-	$title = CHtml::encode($this->pageTitle).' | '.$setting->site_title;
+	$title = CHtml::encode($this->pageTitle).' | '.Yii::app()->name;
 	$description = $this->pageDescription;
 	$keywords = $this->pageMeta;
 	$urlAddress = Utility::getProtocol().'://'.Yii::app()->request->serverName.Yii::app()->request->requestUri;
@@ -44,18 +36,9 @@ if(isset($_GET['protocol']) && $_GET['protocol'] == 'script') {
 			);
 
 		} else { */
-			$page = $this->contentOther == true ? 1 : 0;
 			$dialog = $this->dialogDetail == true ? (empty($this->dialogWidth) ? 1 : 2) : 0;		// 0 = static, 1 = dialog, 2 = notifier
-			$header = $this->widget('AdminMenu', array(), true);
+			$header = /*$this->widget('AdminMenu', array(), true)*/'';
 			
-			if($this->contentOther == true) {
-				$render = array(
-					'content' => $content, 
-					'other' => $this->contentAttribute,
-				);
-			} else {
-				$render = $content;
-			}
 			$return = array(
 				'title' => $title,
 				'description' => $description,
@@ -63,10 +46,10 @@ if(isset($_GET['protocol']) && $_GET['protocol'] == 'script') {
 				'address' => $urlAddress,
 				'dialogWidth' => $dialogWidth,			
 			);
-			$return['page'] = $page;
+			$return['page'] = '0';
 			$return['dialog'] = $dialog;
 			$return['header'] = $this->dialogDetail != true ? $header : '';
-			$return['render'] = $render;
+			$return['render'] = $content;
 			$return['script'] = $cs=Yii::app()->getClientScript()->getOmmuScript();
 		//}
 		echo CJSON::encode($return);
@@ -106,14 +89,13 @@ if(isset($_GET['protocol']) && $_GET['protocol'] == 'script') {
  <body <?php echo $this->dialogDetail == true ? 'style="overflow-y: hidden;"' : '';?>>
 
 <?php 
-if ($module == 'users' && $currentAction == 'admin/login') {
+if($module == null && $currentAction == 'site/login') {
 //if(Yii::app()->user->isGuest) {?>
 	<?php //begin.Notifier ?>
 	<div class="login notifier" <?php echo ($this->dialogDetail == true && !empty($this->dialogWidth)) ? 'name="'.$dialogWidth.'" '.$display : '';?>>
 		<div class="fixed">
 			<div class="valign">
 				<div class="dialog-box">
-					<img src="<?php echo Yii::app()->theme->baseUrl;?>/images/resource/logo_ommu_large.png" alt="">
 					<div class="content" id="<?php echo $dialogWidth;?>" name="notifier-wrapper"><?php echo ($this->dialogDetail == true && !empty($this->dialogWidth)) ? $content : '';?></div>
 				</div>
 			</div>
@@ -124,9 +106,7 @@ if ($module == 'users' && $currentAction == 'admin/login') {
 <?php } else { ?> 
 
 	<?php //begin.Header ?>
-	<header class="clearfix">
-		<?php $this->widget('LanguageFlag'); ?>
-		
+	<header class="clearfix">		
 		<?php //begin.Loading ?>
 		<div class="loading"><img src="<?php echo Yii::app()->theme->baseUrl;?>/images/icons/ajax_loader.gif" /><span>Loading...</span></div>
 		<?php //begin.Success ?>
@@ -164,12 +144,12 @@ if ($module == 'users' && $currentAction == 'admin/login') {
 		<div class="sidebar">
 			<div class="table clearfix">
 				<?php //begin.Information ?>
-				<?php $this->widget('AdminAccount'); ?>
+				<?php //$this->widget('AdminAccount'); ?>
 				<?php //end.Information ?>
 
 				<?php //begin.Menu ?>
 				<div class="menu clearfix">
-					<?php $this->widget('AdminMenu'); ?>
+					<?php //$this->widget('AdminMenu'); ?>
 				</div>
 				<?php //end.Menu ?>
 			</div>
@@ -188,11 +168,14 @@ if ($module == 'users' && $currentAction == 'admin/login') {
 	
 	<?php //begin.Footer ?>
 	<footer class="clearfix">
-		<?php $this->widget('AdminFooterCopyright'); ?>
+		<?php //begin.Copyright ?>
+		<div class="copyright">
+			<?php echo Yii::t('phrase', 'Copyright');?> &copy; <?php echo date("Y") ?> <a href="<?php echo Yii::app()->createUrl('site/index');?>" title="<?php echo Yii::app()->name;?>"><?php echo Yii::app()->name;?></a>. <?php echo Yii::t('phrase', 'All rights reserved');?>.
+		</div>
+		<?php //end.Copyright ?>
 	</footer>
 	<?php //end.Footer ?>
 <?php }?>
-	<?php $this->widget('FrontGoogleAnalytics'); ?>
 
  </body>
 </html>

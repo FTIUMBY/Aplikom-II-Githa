@@ -3,12 +3,6 @@
  * UserLevel
  * version: 0.0.1
  *
- * @author Putra Sudaryanto <putra@sudaryanto.id>
- * @copyright Copyright (c) 2016 Ommu Platform (ommu.co)
- * @created date 20 February 2017, 11:54 WIB
- * @link http://company.ommu.co
- * @contact (+62)856-299-4114
- *
  * This is the template for generating the model class of a specified table.
  * - $this: the ModelCode object
  * - $tableName: the table name for this class (prefix is already removed if necessary)

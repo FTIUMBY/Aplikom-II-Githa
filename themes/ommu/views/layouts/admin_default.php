@@ -6,16 +6,16 @@
 	$currentAction = strtolower(Yii::app()->controller->id.'/'.Yii::app()->controller->action->id);
 	$currentModule = strtolower(Yii::app()->controller->module->id.'/'.Yii::app()->controller->id);
 	$currentModuleAction = strtolower(Yii::app()->controller->module->id.'/'.Yii::app()->controller->id.'/'.Yii::app()->controller->action->id);
-	if($module == null)
+	if($module == null) {
 		$class = $controller;
+		if($module == null && $currentAction == 'site/login')
+			$class = 'login';
 		
-	else {
+	} else {
 		if($controller == 'admin')
 			$class = $module;
 		else
 			$class = $module.'-'.$controller;
-		if($module == 'users' && $currentAction == 'admin/login')
-			$class = 'login';
 	}
 ?>
 	
@@ -24,16 +24,15 @@
 			if ($currentAction != 'site/login') {?>
 			<?php //begin.Title ?>
 			<h1 class="small"><?php echo CHtml::encode($this->pageTitle); ?></h1>
-			<?php echo $this->pageDescription != OmmuSettings::getInfo('site_description') ? '<p class="intro">'.$this->pageDescription.'</p>' : '';?>
 			<?php //end.Title ?>
 
 			<?php //begin.Content Menu ?>
 			<div class="contentmenu clearfix">
-				<?php $this->widget('AdminContentMenu');?>
-				<?php $this->widget('application.components.system.CMenu', array(
+				<?php //$this->widget('AdminContentMenu');?>
+				<?php /*$this->widget('application.components.system.CMenu', array(
 					'items'=>$this->menu,
 					'htmlOptions'=>array('class'=>'gridmenu clearfix'),
-				)); ?>
+				));*/ ?>
 			</div>
 			<?php //end.Content Menu ?>
 		<?php }
