@@ -17,6 +17,16 @@ return array(
 		'application.models.*',
 		'application.components.*',
 	),
+	
+	'modules'=>array(
+		// uncomment the following to enable the Gii tool
+		'gii'=>array(
+			'class'     => 'system.gii.GiiModule',
+			'password'  => '0o9i8u7y',
+			// If removed, Gii defaults to localhost only. Edit carefully to taste.
+			'ipFilters' => array('127.0.0.1','::1'),
+		),
+	),
 
 	// application components
 	'components'=>array(
@@ -24,7 +34,12 @@ return array(
 		// uncomment the following to enable URLs in path-format
 		'urlManager'=>array(
 			'urlFormat'=>'path',
+			'showScriptName' => false,
 			'rules'=>array(
+				'gii'=>'gii',
+				'gii/<controller:\w+>'=>'gii/<controller>',
+				'gii/<controller:\w+>/<action:\w+>'=>'gii/<controller>/<action>',
+				
 				//a standard rule mapping '/' to 'site/index' action
 				'' 																	=> 'site/index',
 				

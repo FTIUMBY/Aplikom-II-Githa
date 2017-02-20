@@ -19,9 +19,11 @@ if(!file_exists(dirname(__FILE__).'/protected/runtime')) {
 $yii    = dirname(__FILE__).'/../yii-1.1.16/framework/yii.php';
 $config = dirname(__FILE__).'/protected/config/common.php';
 
+/*
 if($_SERVER["SERVER_ADDR"]=='127.0.0.1' || $_SERVER["HTTP_HOST"]=='localhost') {
 	$config = dirname(__FILE__).'/protected/config/common-dev.php';
 }
+*/
 
 // remove the following lines when in production mode
 defined('YII_DEBUG') or define('YII_DEBUG',true);
