@@ -40,6 +40,8 @@
 class User extends CActiveRecord
 {
 	public $defaultColumns = array();
+	public $password_input;
+	public $confirm_password_input;
 	
 	// Variable Search
 	public $level_search;
@@ -73,11 +75,15 @@ class User extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('status, level_id, username, user_password, displayname', 'required'),
+			array('status, level_id, username, displayname,
+				password_input, confirm_password_input', 'required'),
 			array('status, level_id, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
-			array('username, user_password', 'length', 'max'=>32),
+			array('username, user_password,
+				password_input, confirm_password_input', 'length', 'max'=>32),
 			array('displayname', 'length', 'max'=>64),
-			array('', 'safe'),
+			array('user_password', 'safe'),
+			array('
+				password_input', 'compare', 'compareAttribute' => 'confirm_password_input', 'message' => 'Kedua password tidak sama.'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('user_id, status, level_id, username, user_password, displayname, creation_date, creation_id, modified_date, modified_id,
@@ -115,6 +121,8 @@ class User extends CActiveRecord
 			'creation_id' => Yii::t('attribute', 'Creation'),
 			'modified_date' => Yii::t('attribute', 'Modified Date'),
 			'modified_id' => Yii::t('attribute', 'Modified'),
+			'password_input' => Yii::t('attribute', 'Password'),
+			'confirm_password_input' => Yii::t('attribute', 'Confirm Password'),
 			'level_search' => Yii::t('attribute', 'Level'),
 			'creation_search' => Yii::t('attribute', 'Creation'),
 			'modified_search' => Yii::t('attribute', 'Modified'),
@@ -339,5 +347,17 @@ class User extends CActiveRecord
 				$this->modified_id = Yii::app()->user->id;
 		}
 		return true;
+	}
+	
+	/**
+	 * before save attributes
+	 */
+	protected function beforeSave() {
+		if(parent::beforeSave()) {
+			$this->username = strtolower($this->username);
+			if($this->password_input != '')
+				$this->user_password = md5($this->password_input);
+		}
+		return true;	
 	}
 }

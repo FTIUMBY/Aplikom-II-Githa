@@ -63,10 +63,19 @@
 		</div>
 
 		<div class="clearfix">
-			<?php echo $form->labelEx($model,'user_password'); ?>
+			<?php echo $form->labelEx($model,'password_input'); ?>
 			<div class="desc">
-				<?php echo $form->textField($model,'user_password',array('maxlength'=>32,'class'=>'span-6')); ?>
-				<?php echo $form->error($model,'user_password'); ?>
+				<?php echo $form->passwordField($model,'password_input',array('maxlength'=>32,'class'=>'span-6')); ?>
+				<?php echo $form->error($model,'password_input'); ?>
+				<?php /*<div class="small-px silent"></div>*/?>
+			</div>
+		</div>
+
+		<div class="clearfix">
+			<?php echo $form->labelEx($model,'confirm_password_input'); ?>
+			<div class="desc">
+				<?php echo $form->passwordField($model,'confirm_password_input',array('maxlength'=>32,'class'=>'span-6')); ?>
+				<?php echo $form->error($model,'confirm_password_input'); ?>
 				<?php /*<div class="small-px silent"></div>*/?>
 			</div>
 		</div>
