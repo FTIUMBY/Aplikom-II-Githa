@@ -135,7 +135,7 @@ class UserlevelController extends Controller
 		$this->pageTitle = Yii::t('phrase', 'User Levels');
 		$this->pageDescription = $setting->meta_description;
 		$this->pageMeta = $setting->meta_keyword;
-		$this->render('front_index',array(
+		$this->render('/user_level/front_index',array(
 			'dataProvider'=>$dataProvider,
 		));
 		//$this->redirect(array('manage'));
@@ -161,11 +161,11 @@ class UserlevelController extends Controller
 		$this->pageTitle = Yii::t('phrase', 'View User Levels');
 		$this->pageDescription = '';
 		$this->pageMeta = $setting->meta_keyword;
-		$this->render('front_view',array(
+		$this->render('/user_level/front_view',array(
 			'model'=>$model,
 		));
 		/*
-		$this->render('admin_view',array(
+		$this->render('/user_level/admin_view',array(
 			'model'=>$model,
 		));
 		*/
@@ -195,7 +195,7 @@ class UserlevelController extends Controller
 		$this->pageTitle = Yii::t('phrase', 'User Levels Manage');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
-		$this->render('admin_manage',array(
+		$this->render('/user_level/admin_manage',array(
 			'model'=>$model,
 			'columns' => $columns,
 		));
@@ -261,7 +261,7 @@ class UserlevelController extends Controller
 		$this->pageTitle = Yii::t('phrase', 'Create User Levels');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
-		$this->render('admin_add',array(
+		$this->render('/user_level/admin_add',array(
 			'model'=>$model,
 		));
 	}
@@ -327,7 +327,7 @@ class UserlevelController extends Controller
 		$this->pageTitle = Yii::t('phrase', 'Update User Levels');
 		$this->pageDescription = '';
 		$this->pageMeta = '';
-		$this->render('admin_edit',array(
+		$this->render('/user_level/admin_edit',array(
 			'model'=>$model,
 		));
 	}
@@ -398,7 +398,7 @@ class UserlevelController extends Controller
 			$this->pageTitle = Yii::t('phrase', 'UserLevel Delete.');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
-			$this->render('admin_delete');
+			$this->render('/user_level/admin_delete');
 		}
 	}
 
@@ -455,7 +455,7 @@ class UserlevelController extends Controller
 			$this->pageTitle = $title;
 			$this->pageDescription = '';
 			$this->pageMeta = '';
-			$this->render('admin_publish',array(
+			$this->render('/user_level/admin_publish',array(
 				'title'=>$title,
 				'model'=>$model,
 			));
@@ -496,7 +496,7 @@ class UserlevelController extends Controller
 			$this->pageTitle = Yii::t('phrase', 'Headline');
 			$this->pageDescription = '';
 			$this->pageMeta = '';
-			$this->render('admin_headline');
+			$this->render('/user_level/admin_headline');
 		}
 	}
 
