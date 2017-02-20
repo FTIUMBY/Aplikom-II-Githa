@@ -16,7 +16,6 @@
  *	RunAction
  *	Delete
  *	Publish
- *	Headline
  *
  *	LoadModel
  *	performAjaxValidation
