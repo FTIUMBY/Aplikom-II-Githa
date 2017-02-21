@@ -42,6 +42,10 @@
  * @property integer $dk_tahun_mulai
  * @property integer $dk_tahun_akhir
  * @property string $dk_jurusan
+ * @property string $creation_date
+ * @property integer $creation_id
+ * @property string $modified_date
+ * @property integer $modified_id
  *
  * The followings are the available model relations:
  * @property TblPegawai $pegawai
@@ -49,6 +53,11 @@
 class Pendidikan extends CActiveRecord
 {
 	public $defaultColumns = array();
+	
+	// Variable Search
+	public $pegawai_search;
+	public $creation_search;
+	public $modified_search;	
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -77,14 +86,16 @@ class Pendidikan extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('sd_nama, sd_tahun_mulai, sd_tahun_akhir, smp_nama, smp_tahun_mulai, smp_tahun_akhir, sma_nama, sma_tahun_mulai, sma_tahun_akhir, sma_jurusan, sj_nama, sj_tahun_mulai, sj_tahun_akhir, sj_jurusan, pc_nama, pc_tahun_mulai, pc_tahun_akhir, pc_jurusan, dk_nama, dk_tahun_mulai, dk_tahun_akhir, dk_jurusan', 'required'),
-			array('status, pegawai_id, sd_tahun_mulai, sd_tahun_akhir, smp_tahun_mulai, smp_tahun_akhir, sma_tahun_mulai, sma_tahun_akhir, sj_tahun_mulai, sj_tahun_akhir, pc_tahun_mulai, pc_tahun_akhir, dk_tahun_mulai, dk_tahun_akhir', 'numerical', 'integerOnly'=>true),
+			array('pegawai_id, sd_nama, sd_tahun_mulai, sd_tahun_akhir, smp_nama, smp_tahun_mulai, smp_tahun_akhir, sma_nama, sma_tahun_mulai, sma_tahun_akhir, sma_jurusan, sj_nama, sj_tahun_mulai, sj_tahun_akhir, sj_jurusan, pc_nama, pc_tahun_mulai, pc_tahun_akhir, pc_jurusan, dk_nama, dk_tahun_mulai, dk_tahun_akhir, dk_jurusan', 'required'),
+			array('status, pegawai_id, sd_tahun_mulai, sd_tahun_akhir, smp_tahun_mulai, smp_tahun_akhir, sma_tahun_mulai, sma_tahun_akhir, sj_tahun_mulai, sj_tahun_akhir, pc_tahun_mulai, pc_tahun_akhir, dk_tahun_mulai, dk_tahun_akhir, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
 			array('sd_nama, dk_nama', 'length', 'max'=>11),
 			array('smp_nama, sma_nama, pc_nama', 'length', 'max'=>30),
 			array('sma_jurusan, sj_nama, sj_jurusan, pc_jurusan, dk_jurusan', 'length', 'max'=>25),
+			array('', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('pendidikan_id, status, pegawai_id, sd_nama, sd_tahun_mulai, sd_tahun_akhir, smp_nama, smp_tahun_mulai, smp_tahun_akhir, sma_nama, sma_tahun_mulai, sma_tahun_akhir, sma_jurusan, sj_nama, sj_tahun_mulai, sj_tahun_akhir, sj_jurusan, pc_nama, pc_tahun_mulai, pc_tahun_akhir, pc_jurusan, dk_nama, dk_tahun_mulai, dk_tahun_akhir, dk_jurusan', 'safe', 'on'=>'search'),
+			array('pendidikan_id, status, pegawai_id, sd_nama, sd_tahun_mulai, sd_tahun_akhir, smp_nama, smp_tahun_mulai, smp_tahun_akhir, sma_nama, sma_tahun_mulai, sma_tahun_akhir, sma_jurusan, sj_nama, sj_tahun_mulai, sj_tahun_akhir, sj_jurusan, pc_nama, pc_tahun_mulai, pc_tahun_akhir, pc_jurusan, dk_nama, dk_tahun_mulai, dk_tahun_akhir, dk_jurusan, creation_date, creation_id, modified_date, modified_id,
+				pegawai_search, creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -96,7 +107,9 @@ class Pendidikan extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'pegawai_relation' => array(self::BELONGS_TO, 'TblPegawai', 'pegawai_id'),
+			//'pegawai_relation' => array(self::BELONGS_TO, 'TblPegawai', 'pegawai_id'),
+			'creation' => array(self::BELONGS_TO, 'User', 'creation_id'),
+			'modified' => array(self::BELONGS_TO, 'User', 'modified_id'),
 		);
 	}
 
@@ -131,6 +144,13 @@ class Pendidikan extends CActiveRecord
 			'dk_tahun_mulai' => Yii::t('attribute', 'Dk Tahun Mulai'),
 			'dk_tahun_akhir' => Yii::t('attribute', 'Dk Tahun Akhir'),
 			'dk_jurusan' => Yii::t('attribute', 'Dk Jurusan'),
+			'creation_date' => Yii::t('attribute', 'Creation Date'),
+			'creation_id' => Yii::t('attribute', 'Creation'),
+			'modified_date' => Yii::t('attribute', 'Modified Date'),
+			'modified_id' => Yii::t('attribute', 'Modified'),
+			'pegawai_search' => Yii::t('attribute', 'Pegawai'),
+			'creation_search' => Yii::t('attribute', 'Creation'),
+			'modified_search' => Yii::t('attribute', 'Modified'),
 		);
 		/*
 			'Pendidikan' => 'Pendidikan',
@@ -179,6 +199,24 @@ class Pendidikan extends CActiveRecord
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
 		$criteria=new CDbCriteria;
+		
+		// Custom Search
+		$criteria->with = array(
+			/*
+			'pegawai' => array(
+				'alias'=>'pegawai',
+				'select'=>'nama'
+			),
+			*/
+			'creation' => array(
+				'alias'=>'creation',
+				'select'=>'displayname'
+			),
+			'modified' => array(
+				'alias'=>'modified',
+				'select'=>'displayname'
+			),
+		);
 
 		$criteria->compare('t.pendidikan_id',$this->pendidikan_id);
 		$criteria->compare('t.status',$this->status);
@@ -208,6 +246,22 @@ class Pendidikan extends CActiveRecord
 		$criteria->compare('t.dk_tahun_mulai',$this->dk_tahun_mulai);
 		$criteria->compare('t.dk_tahun_akhir',$this->dk_tahun_akhir);
 		$criteria->compare('t.dk_jurusan',strtolower($this->dk_jurusan),true);
+		if($this->creation_date != null && !in_array($this->creation_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.creation_date)',date('Y-m-d', strtotime($this->creation_date)));
+		if(isset($_GET['creation']))
+			$criteria->compare('t.creation_id',$_GET['creation']);
+		else
+			$criteria->compare('t.creation_id',$this->creation_id);
+		if($this->modified_date != null && !in_array($this->modified_date, array('0000-00-00 00:00:00', '0000-00-00')))
+			$criteria->compare('date(t.modified_date)',date('Y-m-d', strtotime($this->modified_date)));
+		if(isset($_GET['modified']))
+			$criteria->compare('t.modified_id',$_GET['modified']);
+		else
+			$criteria->compare('t.modified_id',$this->modified_id);
+		
+		$criteria->compare('pegawai.nama',strtolower($this->pegawai_search), true);
+		$criteria->compare('creation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('modified.displayname',strtolower($this->modified_search), true);
 
 		if(!isset($_GET['Pendidikan_sort']))
 			$criteria->order = 't.pendidikan_id DESC';
@@ -263,6 +317,10 @@ class Pendidikan extends CActiveRecord
 			$this->defaultColumns[] = 'dk_tahun_mulai';
 			$this->defaultColumns[] = 'dk_tahun_akhir';
 			$this->defaultColumns[] = 'dk_jurusan';
+			$this->defaultColumns[] = 'creation_date';
+			$this->defaultColumns[] = 'creation_id';
+			$this->defaultColumns[] = 'modified_date';
+			$this->defaultColumns[] = 'modified_id';
 		}
 
 		return $this->defaultColumns;
@@ -285,20 +343,6 @@ class Pendidikan extends CActiveRecord
 				'header' => 'No',
 				'value' => '$this->grid->dataProvider->pagination->currentPage*$this->grid->dataProvider->pagination->pageSize + $row+1'
 			);
-			if(!isset($_GET['type'])) {
-				$this->defaultColumns[] = array(
-					'name' => 'status',
-					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("status",array("id"=>$data->pendidikan_id)), $data->status, 1)',
-					'htmlOptions' => array(
-						'class' => 'center',
-					),
-					'filter'=>array(
-						1=>Yii::t('phrase', 'Yes'),
-						0=>Yii::t('phrase', 'No'),
-					),
-					'type' => 'raw',
-				);
-			}
 			$this->defaultColumns[] = 'pegawai_id';
 			$this->defaultColumns[] = 'sd_nama';
 			$this->defaultColumns[] = 'sd_tahun_mulai';
@@ -322,6 +366,52 @@ class Pendidikan extends CActiveRecord
 			$this->defaultColumns[] = 'dk_tahun_mulai';
 			$this->defaultColumns[] = 'dk_tahun_akhir';
 			$this->defaultColumns[] = 'dk_jurusan';
+			/*
+			$this->defaultColumns[] = array(
+				'name' => 'creation_search',
+				'value' => '$data->creation->displayname',
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'creation_date',
+				'value' => 'Utility::dateFormat($data->creation_date)',
+				'htmlOptions' => array(
+					'class' => 'center',
+				),
+				'filter' => Yii::app()->controller->widget('zii.widgets.jui.CJuiDatePicker', array(
+					'model'=>$this,
+					'attribute'=>'creation_date',
+					'language' => 'ja',
+					'i18nScriptFile' => 'jquery.ui.datepicker-en.js',
+					//'mode'=>'datetime',
+					'htmlOptions' => array(
+						'id' => 'creation_date_filter',
+					),
+					'options'=>array(
+						'showOn' => 'focus',
+						'dateFormat' => 'dd-mm-yy',
+						'showOtherMonths' => true,
+						'selectOtherMonths' => true,
+						'changeMonth' => true,
+						'changeYear' => true,
+						'showButtonPanel' => true,
+					),
+				), true),
+			);
+			*/
+			if(!isset($_GET['type'])) {
+				$this->defaultColumns[] = array(
+					'name' => 'status',
+					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("publish",array("id"=>$data->pendidikan_id)), $data->status, 1)',
+					'htmlOptions' => array(
+						'class' => 'center',
+					),
+					'filter'=>array(
+						1=>Yii::t('phrase', 'Yes'),
+						0=>Yii::t('phrase', 'No'),
+					),
+					'type' => 'raw',
+				);
+			}
 		}
 		parent::afterConstruct();
 	}
@@ -346,68 +436,14 @@ class Pendidikan extends CActiveRecord
 	/**
 	 * before validate attributes
 	 */
-	/*
 	protected function beforeValidate() {
-		if(parent::beforeValidate()) {
-			// Create action
+		if(parent::beforeValidate()) {	
+			if($this->isNewRecord)
+				$this->creation_id = Yii::app()->user->id;			
+			else
+				$this->modified_id = Yii::app()->user->id;
 		}
 		return true;
 	}
-	*/
-
-	/**
-	 * after validate attributes
-	 */
-	/*
-	protected function afterValidate()
-	{
-		parent::afterValidate();
-			// Create action
-		return true;
-	}
-	*/
-	
-	/**
-	 * before save attributes
-	 */
-	/*
-	protected function beforeSave() {
-		if(parent::beforeSave()) {
-		}
-		return true;	
-	}
-	*/
-	
-	/**
-	 * After save attributes
-	 */
-	/*
-	protected function afterSave() {
-		parent::afterSave();
-		// Create action
-	}
-	*/
-
-	/**
-	 * Before delete attributes
-	 */
-	/*
-	protected function beforeDelete() {
-		if(parent::beforeDelete()) {
-			// Create action
-		}
-		return true;
-	}
-	*/
-
-	/**
-	 * After delete attributes
-	 */
-	/*
-	protected function afterDelete() {
-		parent::afterDelete();
-		// Create action
-	}
-	*/
 
 }

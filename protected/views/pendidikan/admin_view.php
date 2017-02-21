@@ -13,13 +13,6 @@
 	);
 ?>
 
-<?php //begin.Messages ?>
-<?php
-if(Yii::app()->user->hasFlash('success'))
-	echo Utility::flashSuccess(Yii::app()->user->getFlash('success'));
-?>
-<?php //end.Messages ?>
-
 <?php $this->widget('application.components.system.FDetailView', array(
 	'data'=>$model,
 	'attributes'=>array(
@@ -148,11 +141,21 @@ if(Yii::app()->user->hasFlash('success'))
 			'value'=>$model->dk_jurusan,
 			//'value'=>$model->dk_jurusan != '' ? $model->dk_jurusan : '-',
 		),
+		array(
+			'name'=>'creation_date',
+			'value'=>!in_array($model->creation_date, array('0000-00-00 00:00:00','1970-01-01 00:00:00')) ? Utility::dateFormat($model->creation_date, true) : '-',
+		),
+		array(
+			'name'=>'creation_id',
+			'value'=>$model->creation_id != 0 ? $model->creation->displayname : '-',
+		),
+		array(
+			'name'=>'modified_date',
+			'value'=>!in_array($model->modified_date, array('0000-00-00 00:00:00','1970-01-01 00:00:00')) ? Utility::dateFormat($model->modified_date, true) : '-',
+		),
+		array(
+			'name'=>'modified_id',
+			'value'=>$model->modified_id != 0 ? $model->modified->displayname : '-',
+		),
 	),
 )); ?>
-
-<div class="dialog-content">
-</div>
-<div class="dialog-submit">
-	<?php echo CHtml::button(Yii::t('phrase', 'Close'), array('id'=>'closed')); ?>
-</div>
