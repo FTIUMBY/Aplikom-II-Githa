@@ -77,14 +77,14 @@ class Ibu extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('pekerjaan_id, agama_id, nama_ibu, kewarganegaraan_i, tingkat_pendidikan_i, alamat_i, telepon_i, penghasilan_i, ttl_i', 'required'),
+			array('pegawai_id, pekerjaan_id, agama_id, nama_ibu, kewarganegaraan_i, tingkat_pendidikan_i, alamat_i, ttl_i', 'required'),
 			array('status, pegawai_id, pekerjaan_id, agama_id, penghasilan_i, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
 			array('nama_ibu', 'length', 'max'=>64),
 			array('ttl_i', 'length', 'max'=>50),
 			array('telepon_i', 'length', 'max'=>15),
 			array('tingkat_pendidikan_i', 'length', 'max'=>7),
 			array('kewarganegaraan_i', 'length', 'max'=>3),
-			array('', 'safe'),
+			array('telepon_i, penghasilan_i', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
 			array('ibu_id, status, pegawai_id, pekerjaan_id, agama_id, nama_ibu, kewarganegaraan_i, tingkat_pendidikan_i, alamat_i, telepon_i, penghasilan_i, ttl_i, creation_date, creation_id, modified_date, modified_id,
