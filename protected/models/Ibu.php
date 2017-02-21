@@ -42,6 +42,13 @@
 class Ibu extends CActiveRecord
 {
 	public $defaultColumns = array();
+	
+	// Variable Search
+	public $pegawai_search;
+	public $pekerjaan_search;
+	public $agama_search;
+	public $creation_search;
+	public $modified_search;	
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -70,17 +77,18 @@ class Ibu extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('pekerjaan_id, agama_id, nama_ibu, kewarganegaraan_i, tingkat_pendidikan_i, alamat_i, telepon_i, penghasilan_i, ttl_i, creation_date, creation_id, modified_id', 'required'),
+			array('pekerjaan_id, agama_id, nama_ibu, kewarganegaraan_i, tingkat_pendidikan_i, alamat_i, telepon_i, penghasilan_i, ttl_i', 'required'),
 			array('status, pegawai_id, pekerjaan_id, agama_id, penghasilan_i, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
-			array('nama_ibu, ttl_i', 'length', 'max'=>50),
-			array('kewarganegaraan_i', 'length', 'max'=>3),
+			array('nama_ibu', 'length', 'max'=>64),
+			array('ttl_i', 'length', 'max'=>50),
+			array('telepon_i', 'length', 'max'=>15),
 			array('tingkat_pendidikan_i', 'length', 'max'=>7),
-			array('alamat_i', 'length', 'max'=>150),
-			array('telepon_i', 'length', 'max'=>12),
-			array('modified_date', 'safe'),
+			array('kewarganegaraan_i', 'length', 'max'=>3),
+			array('', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('ibu_id, status, pegawai_id, pekerjaan_id, agama_id, nama_ibu, kewarganegaraan_i, tingkat_pendidikan_i, alamat_i, telepon_i, penghasilan_i, ttl_i, creation_date, creation_id, modified_date, modified_id', 'safe', 'on'=>'search'),
+			array('ibu_id, status, pegawai_id, pekerjaan_id, agama_id, nama_ibu, kewarganegaraan_i, tingkat_pendidikan_i, alamat_i, telepon_i, penghasilan_i, ttl_i, creation_date, creation_id, modified_date, modified_id,
+				pegawai_search, pekerjaan_search, agama_search, creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -92,9 +100,11 @@ class Ibu extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'pekerjaan_relation' => array(self::BELONGS_TO, 'TblPekerjaan', 'pekerjaan_id'),
-			'agama_relation' => array(self::BELONGS_TO, 'TblAgama', 'agama_id'),
-			'pegawai_relation' => array(self::BELONGS_TO, 'TblPegawai', 'pegawai_id'),
+			//'pegawai' => array(self::BELONGS_TO, 'TblPegawai', 'pegawai_id'),
+			'pekerjaan' => array(self::BELONGS_TO, 'Pekerjaan', 'pekerjaan_id'),
+			'agama' => array(self::BELONGS_TO, 'Agama', 'agama_id'),
+			'creation' => array(self::BELONGS_TO, 'User', 'creation_id'),
+			'modified' => array(self::BELONGS_TO, 'User', 'modified_id'),
 		);
 	}
 
@@ -110,16 +120,21 @@ class Ibu extends CActiveRecord
 			'pekerjaan_id' => Yii::t('attribute', 'Pekerjaan'),
 			'agama_id' => Yii::t('attribute', 'Agama'),
 			'nama_ibu' => Yii::t('attribute', 'Nama Ibu'),
-			'kewarganegaraan_i' => Yii::t('attribute', 'Kewarganegaraan I'),
-			'tingkat_pendidikan_i' => Yii::t('attribute', 'Tingkat Pendidikan I'),
-			'alamat_i' => Yii::t('attribute', 'Alamat I'),
-			'telepon_i' => Yii::t('attribute', 'Telepon I'),
-			'penghasilan_i' => Yii::t('attribute', 'Penghasilan I'),
-			'ttl_i' => Yii::t('attribute', 'Ttl I'),
+			'kewarganegaraan_i' => Yii::t('attribute', 'Kewarganegaraan'),
+			'tingkat_pendidikan_i' => Yii::t('attribute', 'Tingkat Pendidikan'),
+			'alamat_i' => Yii::t('attribute', 'Alamat'),
+			'telepon_i' => Yii::t('attribute', 'Telepon'),
+			'penghasilan_i' => Yii::t('attribute', 'Penghasilan'),
+			'ttl_i' => Yii::t('attribute', 'Ttl'),
 			'creation_date' => Yii::t('attribute', 'Creation Date'),
 			'creation_id' => Yii::t('attribute', 'Creation'),
 			'modified_date' => Yii::t('attribute', 'Modified Date'),
 			'modified_id' => Yii::t('attribute', 'Modified'),
+			'pegawai_search' => Yii::t('attribute', 'Pegawai'),
+			'pekerjaan_search' => Yii::t('attribute', 'Pekerjaan'),
+			'agama_search' => Yii::t('attribute', 'Agama'),
+			'creation_search' => Yii::t('attribute', 'Creation'),
+			'modified_search' => Yii::t('attribute', 'Modified'),
 		);
 		/*
 			'Ibu' => 'Ibu',
@@ -159,6 +174,32 @@ class Ibu extends CActiveRecord
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
 		$criteria=new CDbCriteria;
+		
+		// Custom Search
+		$criteria->with = array(
+			/*
+			'pegawai' => array(
+				'alias'=>'pegawai',
+				'select'=>'nama'
+			),
+			*/
+			'pekerjaan' => array(
+				'alias'=>'pekerjaan',
+				'select'=>'pekerjaan_name'
+			),
+			'agama' => array(
+				'alias'=>'agama',
+				'select'=>'agama_name'
+			),
+			'creation' => array(
+				'alias'=>'creation',
+				'select'=>'displayname'
+			),
+			'modified' => array(
+				'alias'=>'modified',
+				'select'=>'displayname'
+			),
+		);
 
 		$criteria->compare('t.ibu_id',$this->ibu_id);
 		$criteria->compare('t.status',$this->status);
@@ -193,6 +234,12 @@ class Ibu extends CActiveRecord
 			$criteria->compare('t.modified_id',$_GET['modified']);
 		else
 			$criteria->compare('t.modified_id',$this->modified_id);
+		
+		$criteria->compare('pegawai.nama',strtolower($this->pegawai_search), true);
+		$criteria->compare('pekerjaan.pekerjaan_name',strtolower($this->pekerjaan_search), true);
+		$criteria->compare('agama.agama_name',strtolower($this->agama_search), true);
+		$criteria->compare('creation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('modified.displayname',strtolower($this->modified_search), true);
 
 		if(!isset($_GET['Ibu_sort']))
 			$criteria->order = 't.ibu_id DESC';
@@ -261,30 +308,57 @@ class Ibu extends CActiveRecord
 				'header' => 'No',
 				'value' => '$this->grid->dataProvider->pagination->currentPage*$this->grid->dataProvider->pagination->pageSize + $row+1'
 			);
-			if(!isset($_GET['type'])) {
-				$this->defaultColumns[] = array(
-					'name' => 'status',
-					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("status",array("id"=>$data->ibu_id)), $data->status, 1)',
-					'htmlOptions' => array(
-						'class' => 'center',
-					),
-					'filter'=>array(
-						1=>Yii::t('phrase', 'Yes'),
-						0=>Yii::t('phrase', 'No'),
-					),
-					'type' => 'raw',
-				);
-			}
 			$this->defaultColumns[] = 'pegawai_id';
-			$this->defaultColumns[] = 'pekerjaan_id';
-			$this->defaultColumns[] = 'agama_id';
-			$this->defaultColumns[] = 'nama_ibu';
-			$this->defaultColumns[] = 'kewarganegaraan_i';
-			$this->defaultColumns[] = 'tingkat_pendidikan_i';
-			$this->defaultColumns[] = 'alamat_i';
-			$this->defaultColumns[] = 'telepon_i';
-			$this->defaultColumns[] = 'penghasilan_i';
-			$this->defaultColumns[] = 'ttl_i';
+			$this->defaultColumns[] = array(
+				'name' => 'nama_ibu',
+				'value' => '$data->nama_ibu',
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'pekerjaan_id',
+				'value' => '$data->pekerjaan->pekerjaan_name',
+				'filter'=> Pekerjaan::getPekerjaan(),
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'agama_id',
+				'value' => '$data->agama->agama_name',
+				'filter'=> Agama::getAgama(),
+				'htmlOptions' => array(
+					'class' => 'center',
+				),
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'kewarganegaraan_i',
+				'value' => '$data->kewarganegaraan_i',
+				'htmlOptions' => array(
+					'class' => 'center',
+				),
+				'filter'=>array(
+					'WNI'=>Yii::t('phrase', 'WNI'),
+					'WNA'=>Yii::t('phrase', 'WNA'),
+				),
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'tingkat_pendidikan_i',
+				'value' => '$data->tingkat_pendidikan_i',
+				'htmlOptions' => array(
+					'class' => 'center',
+				),
+				'filter'=>array(
+					'SD'=>Yii::t('phrase', 'SD'),
+					'SMP'=>Yii::t('phrase', 'SMP'),
+					'SMA'=>Yii::t('phrase', 'SMA'),
+					'Sarjana'=>Yii::t('phrase', 'Sarjana'),
+				),
+			);
+			//$this->defaultColumns[] = 'alamat_i';
+			//$this->defaultColumns[] = 'telepon_i';
+			//$this->defaultColumns[] = 'penghasilan_i';
+			//$this->defaultColumns[] = 'ttl_i';
+			/*
+			$this->defaultColumns[] = array(
+				'name' => 'creation_search',
+				'value' => '$data->creation->displayname',
+			);
 			$this->defaultColumns[] = array(
 				'name' => 'creation_date',
 				'value' => 'Utility::dateFormat($data->creation_date)',
@@ -311,34 +385,21 @@ class Ibu extends CActiveRecord
 					),
 				), true),
 			);
-			$this->defaultColumns[] = 'creation_id';
-			$this->defaultColumns[] = array(
-				'name' => 'modified_date',
-				'value' => 'Utility::dateFormat($data->modified_date)',
-				'htmlOptions' => array(
-					'class' => 'center',
-				),
-				'filter' => Yii::app()->controller->widget('zii.widgets.jui.CJuiDatePicker', array(
-					'model'=>$this,
-					'attribute'=>'modified_date',
-					'language' => 'ja',
-					'i18nScriptFile' => 'jquery.ui.datepicker-en.js',
-					//'mode'=>'datetime',
+			*/
+			if(!isset($_GET['type'])) {
+				$this->defaultColumns[] = array(
+					'name' => 'status',
+					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("publish",array("id"=>$data->ibu_id)), $data->status, 1)',
 					'htmlOptions' => array(
-						'id' => 'modified_date_filter',
+						'class' => 'center',
 					),
-					'options'=>array(
-						'showOn' => 'focus',
-						'dateFormat' => 'dd-mm-yy',
-						'showOtherMonths' => true,
-						'selectOtherMonths' => true,
-						'changeMonth' => true,
-						'changeYear' => true,
-						'showButtonPanel' => true,
+					'filter'=>array(
+						1=>Yii::t('phrase', 'Yes'),
+						0=>Yii::t('phrase', 'No'),
 					),
-				), true),
-			);
-			$this->defaultColumns[] = 'modified_id';
+					'type' => 'raw',
+				);
+			}
 		}
 		parent::afterConstruct();
 	}
@@ -363,68 +424,14 @@ class Ibu extends CActiveRecord
 	/**
 	 * before validate attributes
 	 */
-	/*
 	protected function beforeValidate() {
-		if(parent::beforeValidate()) {
-			// Create action
+		if(parent::beforeValidate()) {	
+			if($this->isNewRecord)
+				$this->creation_id = Yii::app()->user->id;			
+			else
+				$this->modified_id = Yii::app()->user->id;
 		}
 		return true;
 	}
-	*/
-
-	/**
-	 * after validate attributes
-	 */
-	/*
-	protected function afterValidate()
-	{
-		parent::afterValidate();
-			// Create action
-		return true;
-	}
-	*/
-	
-	/**
-	 * before save attributes
-	 */
-	/*
-	protected function beforeSave() {
-		if(parent::beforeSave()) {
-		}
-		return true;	
-	}
-	*/
-	
-	/**
-	 * After save attributes
-	 */
-	/*
-	protected function afterSave() {
-		parent::afterSave();
-		// Create action
-	}
-	*/
-
-	/**
-	 * Before delete attributes
-	 */
-	/*
-	protected function beforeDelete() {
-		if(parent::beforeDelete()) {
-			// Create action
-		}
-		return true;
-	}
-	*/
-
-	/**
-	 * After delete attributes
-	 */
-	/*
-	protected function afterDelete() {
-		parent::afterDelete();
-		// Create action
-	}
-	*/
 
 }
