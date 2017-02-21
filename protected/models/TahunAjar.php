@@ -257,7 +257,7 @@ class TahunAjar extends CActiveRecord
 			if(!isset($_GET['type'])) {
 				$this->defaultColumns[] = array(
 					'name' => 'status',
-					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("status",array("id"=>$data->tahun_ajar_id)), $data->status, 1)',
+					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("publish",array("id"=>$data->tahun_ajar_id)), $data->status, 1)',
 					'htmlOptions' => array(
 						'class' => 'center',
 					),
