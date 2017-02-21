@@ -48,6 +48,10 @@
  * @property string $tinggi
  * @property string $berat
  * @property string $no_telp
+ * @property string $creation_date
+ * @property integer $creation_id
+ * @property string $modified_date
+ * @property integer $modified_id
  *
  * The followings are the available model relations:
  * @property TblIbu[] $tblIbus
@@ -60,6 +64,10 @@
 class Pegawai extends CActiveRecord
 {
 	public $defaultColumns = array();
+	
+	// Variable Search
+	public $creation_search;
+	public $modified_search;	
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -89,20 +97,22 @@ class Pegawai extends CActiveRecord
 		// will receive user inputs.
 		return array(
 			array('NIP, NPSN, NIK, tahun_ajar_id, sekolah_id, agama_id, nama, gender, tempat_lahir, tgl_lahir, alamat, jumlah_saudara, anak_ke, tahun_masuk, gambar, panggilan, kewarganegaraan_pegawai, saudara_tiri, saudara_angkat, bahasa, tinggal_dengan, jarak, transportasi, gol_darah, penyakit, kelainan_jasmani, tinggi, berat, no_telp', 'required'),
-			array('status, tahun_ajar_id, sekolah_id, agama_id, jumlah_saudara, anak_ke, saudara_tiri, saudara_angkat', 'numerical', 'integerOnly'=>true),
+			array('status, tahun_ajar_id, sekolah_id, agama_id, jumlah_saudara, anak_ke, saudara_tiri, saudara_angkat, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
+			array('gender, gol_darah', 'length', 'max'=>1),
+			array('jarak', 'length', 'max'=>2),
+			array('kewarganegaraan_pegawai, tinggi, berat', 'length', 'max'=>3),
+			array('tahun_masuk', 'length', 'max'=>9),
 			array('NIP', 'length', 'max'=>5),
 			array('NPSN', 'length', 'max'=>10),
-			array('NIK', 'length', 'max'=>21),
-			array('nama, tempat_lahir, tinggal_dengan', 'length', 'max'=>64),
-			array('gender, gol_darah', 'length', 'max'=>1),
-			array('tahun_masuk', 'length', 'max'=>9),
-			array('panggilan, transportasi', 'length', 'max'=>32),
-			array('kewarganegaraan_pegawai, tinggi, berat', 'length', 'max'=>3),
-			array('jarak', 'length', 'max'=>2),
 			array('no_telp', 'length', 'max'=>15),
+			array('NIK', 'length', 'max'=>21),
+			array('panggilan, transportasi', 'length', 'max'=>32),
+			array('nama, tempat_lahir, tinggal_dengan', 'length', 'max'=>64),
+			array('', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('pegawai_id, NIP, NPSN, NIK, status, tahun_ajar_id, sekolah_id, agama_id, nama, gender, tempat_lahir, tgl_lahir, alamat, jumlah_saudara, anak_ke, tahun_masuk, gambar, panggilan, kewarganegaraan_pegawai, saudara_tiri, saudara_angkat, bahasa, tinggal_dengan, jarak, transportasi, gol_darah, penyakit, kelainan_jasmani, tinggi, berat, no_telp', 'safe', 'on'=>'search'),
+			array('pegawai_id, NIP, NPSN, NIK, status, tahun_ajar_id, sekolah_id, agama_id, nama, gender, tempat_lahir, tgl_lahir, alamat, jumlah_saudara, anak_ke, tahun_masuk, gambar, panggilan, kewarganegaraan_pegawai, saudara_tiri, saudara_angkat, bahasa, tinggal_dengan, jarak, transportasi, gol_darah, penyakit, kelainan_jasmani, tinggi, berat, no_telp, creation_date, creation_id, modified_date, modified_id,
+				creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -114,12 +124,14 @@ class Pegawai extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			'tblIbus_relation' => array(self::HAS_MANY, 'TblIbu', 'pegawai_id'),
-			'tblNonformals_relation' => array(self::HAS_MANY, 'TblNonformal', 'pegawai_id'),
-			'agama_relation' => array(self::BELONGS_TO, 'TblAgama', 'agama_id'),
-			'tahunAjar_relation' => array(self::BELONGS_TO, 'TblTahunAjar', 'tahun_ajar_id'),
-			'sekolah_relation' => array(self::BELONGS_TO, 'TblAsalSekolah', 'sekolah_id'),
-			'tblPendidikans_relation' => array(self::HAS_MANY, 'TblPendidikan', 'pegawai_id'),
+			'agama' => array(self::BELONGS_TO, 'Agama', 'agama_id'),
+			'tahunajar' => array(self::BELONGS_TO, 'TahunAjar', 'tahun_ajar_id'),
+			'sekolah' => array(self::BELONGS_TO, 'Sekolah', 'sekolah_id'),
+			'creation' => array(self::BELONGS_TO, 'User', 'creation_id'),
+			'modified' => array(self::BELONGS_TO, 'User', 'modified_id'),
+			'ibus' => array(self::HAS_MANY, 'Ibu', 'pegawai_id'),
+			'nonformals' => array(self::HAS_MANY, 'Nonformal', 'pegawai_id'),
+			'pendidikans' => array(self::HAS_MANY, 'Pendidikan', 'pegawai_id'),
 		);
 	}
 
@@ -130,9 +142,9 @@ class Pegawai extends CActiveRecord
 	{
 		return array(
 			'pegawai_id' => Yii::t('attribute', 'Pegawai'),
-			'NIP' => Yii::t('attribute', 'Nip'),
-			'NPSN' => Yii::t('attribute', 'Npsn'),
-			'NIK' => Yii::t('attribute', 'Nik'),
+			'NIP' => Yii::t('attribute', 'NIP'),
+			'NPSN' => Yii::t('attribute', 'NPSN'),
+			'NIK' => Yii::t('attribute', 'NIK'),
 			'status' => Yii::t('attribute', 'Status'),
 			'tahun_ajar_id' => Yii::t('attribute', 'Tahun Ajar'),
 			'sekolah_id' => Yii::t('attribute', 'Sekolah'),
@@ -160,6 +172,13 @@ class Pegawai extends CActiveRecord
 			'tinggi' => Yii::t('attribute', 'Tinggi'),
 			'berat' => Yii::t('attribute', 'Berat'),
 			'no_telp' => Yii::t('attribute', 'No Telp'),
+			'creation_date' => Yii::t('attribute', 'Creation Date'),
+			'creation_id' => Yii::t('attribute', 'Creation'),
+			'modified_date' => Yii::t('attribute', 'Modified Date'),
+			'modified_id' => Yii::t('attribute', 'Modified'),
+			'pegawai_search' => Yii::t('attribute', 'Pegawai'),
+			'creation_search' => Yii::t('attribute', 'Creation'),
+			'modified_search' => Yii::t('attribute', 'Modified'),
 		);
 		/*
 			'Pegawai' => 'Pegawai',
@@ -214,6 +233,18 @@ class Pegawai extends CActiveRecord
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
 		$criteria=new CDbCriteria;
+		
+		// Custom Search
+		$criteria->with = array(
+			'creation' => array(
+				'alias'=>'creation',
+				'select'=>'displayname'
+			),
+			'modified' => array(
+				'alias'=>'modified',
+				'select'=>'displayname'
+			),
+		);
 
 		$criteria->compare('t.pegawai_id',$this->pegawai_id);
 		$criteria->compare('t.NIP',strtolower($this->NIP),true);
@@ -255,7 +286,10 @@ class Pegawai extends CActiveRecord
 		$criteria->compare('t.kelainan_jasmani',strtolower($this->kelainan_jasmani),true);
 		$criteria->compare('t.tinggi',strtolower($this->tinggi),true);
 		$criteria->compare('t.berat',strtolower($this->berat),true);
-		$criteria->compare('t.no_telp',strtolower($this->no_telp),true);
+		$criteria->compare('t.no_telp',strtolower($this->no_telp),true);		
+		
+		$criteria->compare('creation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('modified.displayname',strtolower($this->modified_search), true);
 
 		if(!isset($_GET['Pegawai_sort']))
 			$criteria->order = 't.pegawai_id DESC';
@@ -317,6 +351,10 @@ class Pegawai extends CActiveRecord
 			$this->defaultColumns[] = 'tinggi';
 			$this->defaultColumns[] = 'berat';
 			$this->defaultColumns[] = 'no_telp';
+			$this->defaultColumns[] = 'creation_date';
+			$this->defaultColumns[] = 'creation_id';
+			$this->defaultColumns[] = 'modified_date';
+			$this->defaultColumns[] = 'modified_id';
 		}
 
 		return $this->defaultColumns;
@@ -342,20 +380,6 @@ class Pegawai extends CActiveRecord
 			$this->defaultColumns[] = 'NIP';
 			$this->defaultColumns[] = 'NPSN';
 			$this->defaultColumns[] = 'NIK';
-			if(!isset($_GET['type'])) {
-				$this->defaultColumns[] = array(
-					'name' => 'status',
-					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("status",array("id"=>$data->pegawai_id)), $data->status, 1)',
-					'htmlOptions' => array(
-						'class' => 'center',
-					),
-					'filter'=>array(
-						1=>Yii::t('phrase', 'Yes'),
-						0=>Yii::t('phrase', 'No'),
-					),
-					'type' => 'raw',
-				);
-			}
 			$this->defaultColumns[] = 'tahun_ajar_id';
 			$this->defaultColumns[] = 'sekolah_id';
 			$this->defaultColumns[] = 'agama_id';
@@ -407,6 +431,52 @@ class Pegawai extends CActiveRecord
 			$this->defaultColumns[] = 'tinggi';
 			$this->defaultColumns[] = 'berat';
 			$this->defaultColumns[] = 'no_telp';
+			/*
+			$this->defaultColumns[] = array(
+				'name' => 'creation_search',
+				'value' => '$data->creation->displayname',
+			);
+			$this->defaultColumns[] = array(
+				'name' => 'creation_date',
+				'value' => 'Utility::dateFormat($data->creation_date)',
+				'htmlOptions' => array(
+					'class' => 'center',
+				),
+				'filter' => Yii::app()->controller->widget('zii.widgets.jui.CJuiDatePicker', array(
+					'model'=>$this,
+					'attribute'=>'creation_date',
+					'language' => 'ja',
+					'i18nScriptFile' => 'jquery.ui.datepicker-en.js',
+					//'mode'=>'datetime',
+					'htmlOptions' => array(
+						'id' => 'creation_date_filter',
+					),
+					'options'=>array(
+						'showOn' => 'focus',
+						'dateFormat' => 'dd-mm-yy',
+						'showOtherMonths' => true,
+						'selectOtherMonths' => true,
+						'changeMonth' => true,
+						'changeYear' => true,
+						'showButtonPanel' => true,
+					),
+				), true),
+			);
+			*/
+			if(!isset($_GET['type'])) {
+				$this->defaultColumns[] = array(
+					'name' => 'status',
+					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("status",array("id"=>$data->pegawai_id)), $data->status, 1)',
+					'htmlOptions' => array(
+						'class' => 'center',
+					),
+					'filter'=>array(
+						1=>Yii::t('phrase', 'Yes'),
+						0=>Yii::t('phrase', 'No'),
+					),
+					'type' => 'raw',
+				);
+			}
 		}
 		parent::afterConstruct();
 	}
@@ -431,69 +501,14 @@ class Pegawai extends CActiveRecord
 	/**
 	 * before validate attributes
 	 */
-	/*
 	protected function beforeValidate() {
-		if(parent::beforeValidate()) {
-			// Create action
+		if(parent::beforeValidate()) {	
+			if($this->isNewRecord)
+				$this->creation_id = Yii::app()->user->id;			
+			else
+				$this->modified_id = Yii::app()->user->id;
 		}
 		return true;
 	}
-	*/
-
-	/**
-	 * after validate attributes
-	 */
-	/*
-	protected function afterValidate()
-	{
-		parent::afterValidate();
-			// Create action
-		return true;
-	}
-	*/
-	
-	/**
-	 * before save attributes
-	 */
-	/*
-	protected function beforeSave() {
-		if(parent::beforeSave()) {
-			//$this->tgl_lahir = date('Y-m-d', strtotime($this->tgl_lahir));
-		}
-		return true;	
-	}
-	*/
-	
-	/**
-	 * After save attributes
-	 */
-	/*
-	protected function afterSave() {
-		parent::afterSave();
-		// Create action
-	}
-	*/
-
-	/**
-	 * Before delete attributes
-	 */
-	/*
-	protected function beforeDelete() {
-		if(parent::beforeDelete()) {
-			// Create action
-		}
-		return true;
-	}
-	*/
-
-	/**
-	 * After delete attributes
-	 */
-	/*
-	protected function afterDelete() {
-		parent::afterDelete();
-		// Create action
-	}
-	*/
 
 }
