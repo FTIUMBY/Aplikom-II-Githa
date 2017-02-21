@@ -10,7 +10,7 @@
 
 	$this->breadcrumbs=array(
 		'Sekolahs'=>array('manage'),
-		$model->kd_sekolah=>array('view','id'=>$model->kd_sekolah),
+		$model->sekolah_id=>array('view','id'=>$model->sekolah_id),
 		'Update',
 	);
 ?>

@@ -9,7 +9,7 @@
 
 	$this->breadcrumbs=array(
 		'Sekolahs'=>array('manage'),
-		$model->kd_sekolah,
+		$model->sekolah_id,
 	);
 ?>
 
@@ -18,8 +18,8 @@
 		'data'=>$model,
 		'attributes'=>array(
 			array(
-				'name'=>'kd_sekolah',
-				'value'=>$model->kd_sekolah,
+				'name'=>'sekolah_id',
+				'value'=>$model->sekolah_id,
 			),
 			array(
 				'name'=>'status',

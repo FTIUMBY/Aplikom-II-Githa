@@ -17,7 +17,7 @@
  * This is the model class for table "tbl_asal_sekolah".
  *
  * The followings are the available columns in table 'tbl_asal_sekolah':
- * @property integer $kd_sekolah
+ * @property integer $sekolah_id
  * @property integer $status
  * @property string $sekolah_name
  * @property string $sekolah_address
@@ -73,7 +73,7 @@ class Sekolah extends CActiveRecord
 			array('sekolah_address, sekolah_phone', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('kd_sekolah, status, sekolah_name, sekolah_address, sekolah_phone, creation_date, creation_id, modified_date, modified_id,
+			array('sekolah_id, status, sekolah_name, sekolah_address, sekolah_phone, creation_date, creation_id, modified_date, modified_id,
 				creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
@@ -98,7 +98,7 @@ class Sekolah extends CActiveRecord
 	public function attributeLabels()
 	{
 		return array(
-			'kd_sekolah' => Yii::t('attribute', 'Kd Sekolah'),
+			'sekolah_id' => Yii::t('attribute', 'Sekolah'),
 			'status' => Yii::t('attribute', 'Status'),
 			'sekolah_name' => Yii::t('attribute', 'Sekolah Name'),
 			'sekolah_address' => Yii::t('attribute', 'Sekolah Address'),
@@ -154,7 +154,7 @@ class Sekolah extends CActiveRecord
 			),
 		);
 
-		$criteria->compare('t.kd_sekolah',$this->kd_sekolah);
+		$criteria->compare('t.sekolah_id',$this->sekolah_id);
 		$criteria->compare('t.status',$this->status);
 		$criteria->compare('t.sekolah_name',strtolower($this->sekolah_name),true);
 		$criteria->compare('t.sekolah_address',strtolower($this->sekolah_address),true);
@@ -176,7 +176,7 @@ class Sekolah extends CActiveRecord
 		$criteria->compare('modified.displayname',strtolower($this->modified_search), true);
 
 		if(!isset($_GET['Sekolah_sort']))
-			$criteria->order = 't.kd_sekolah DESC';
+			$criteria->order = 't.sekolah_id DESC';
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -204,7 +204,7 @@ class Sekolah extends CActiveRecord
 				$this->defaultColumns[] = $val;
 			}
 		} else {
-			//$this->defaultColumns[] = 'kd_sekolah';
+			//$this->defaultColumns[] = 'sekolah_id';
 			$this->defaultColumns[] = 'status';
 			$this->defaultColumns[] = 'sekolah_name';
 			$this->defaultColumns[] = 'sekolah_address';
@@ -271,7 +271,7 @@ class Sekolah extends CActiveRecord
 			if(!isset($_GET['type'])) {
 				$this->defaultColumns[] = array(
 					'name' => 'status',
-					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("status",array("id"=>$data->kd_sekolah)), $data->status, 1)',
+					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("publish",array("id"=>$data->sekolah_id)), $data->status, 1)',
 					'htmlOptions' => array(
 						'class' => 'center',
 					),

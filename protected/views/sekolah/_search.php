@@ -15,8 +15,8 @@
 )); ?>
 	<ul>
 		<li>
-			<?php echo $model->getAttributeLabel('kd_sekolah'); ?><br/>
-			<?php echo $form->textField($model,'kd_sekolah'); ?>
+			<?php echo $model->getAttributeLabel('sekolah_id'); ?><br/>
+			<?php echo $form->textField($model,'sekolah_id'); ?>
 		</li>
 
 		<li>
