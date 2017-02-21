@@ -85,7 +85,7 @@ class Nonformal extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			//'pegawai_relation' => array(self::BELONGS_TO, 'TblPegawai', 'pegawai_id'),
+			'pegawai' => array(self::BELONGS_TO, 'Pegawai', 'pegawai_id'),
 			'creation' => array(self::BELONGS_TO, 'User', 'creation_id'),
 			'modified' => array(self::BELONGS_TO, 'User', 'modified_id'),
 		);
@@ -144,12 +144,10 @@ class Nonformal extends CActiveRecord
 		
 		// Custom Search
 		$criteria->with = array(
-			/*
 			'pegawai' => array(
 				'alias'=>'pegawai',
 				'select'=>'nama'
 			),
-			*/
 			'creation' => array(
 				'alias'=>'creation',
 				'select'=>'displayname'
@@ -245,7 +243,10 @@ class Nonformal extends CActiveRecord
 				'header' => 'No',
 				'value' => '$this->grid->dataProvider->pagination->currentPage*$this->grid->dataProvider->pagination->pageSize + $row+1'
 			);
-			$this->defaultColumns[] = 'pegawai_id';
+			$this->defaultColumns[] = array(
+				'name' => 'pegawai_id',
+				'value' => '$data->pegawai_id != null ? $data->pegawai->nama : \'\'',
+			);
 			$this->defaultColumns[] = 'nm_lembaga';
 			$this->defaultColumns[] = 'jurusan_nf';
 			$this->defaultColumns[] = array(

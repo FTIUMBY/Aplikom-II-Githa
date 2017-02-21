@@ -100,7 +100,7 @@ class Ibu extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-			//'pegawai' => array(self::BELONGS_TO, 'TblPegawai', 'pegawai_id'),
+			'pegawai' => array(self::BELONGS_TO, 'Pegawai', 'pegawai_id'),
 			'pekerjaan' => array(self::BELONGS_TO, 'Pekerjaan', 'pekerjaan_id'),
 			'agama' => array(self::BELONGS_TO, 'Agama', 'agama_id'),
 			'creation' => array(self::BELONGS_TO, 'User', 'creation_id'),
@@ -177,12 +177,10 @@ class Ibu extends CActiveRecord
 		
 		// Custom Search
 		$criteria->with = array(
-			/*
 			'pegawai' => array(
 				'alias'=>'pegawai',
 				'select'=>'nama'
 			),
-			*/
 			'pekerjaan' => array(
 				'alias'=>'pekerjaan',
 				'select'=>'pekerjaan_name'
@@ -308,7 +306,10 @@ class Ibu extends CActiveRecord
 				'header' => 'No',
 				'value' => '$this->grid->dataProvider->pagination->currentPage*$this->grid->dataProvider->pagination->pageSize + $row+1'
 			);
-			$this->defaultColumns[] = 'pegawai_id';
+			$this->defaultColumns[] = array(
+				'name' => 'pegawai_id',
+				'value' => '$data->pegawai_id != null ? $data->pegawai->nama : \'\'',
+			);
 			$this->defaultColumns[] = array(
 				'name' => 'nama_ibu',
 				'value' => '$data->nama_ibu',
