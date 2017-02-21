@@ -304,8 +304,7 @@ class UserLevel extends CActiveRecord
 		
 		$criteria=new CDbCriteria;
 		if($status != null)
-			$criteria->compare('t.status',$status);
-		
+			$criteria->compare('t.status',$status);		
 		$model = self::model()->findAll($criteria);
 
 		$items = array();

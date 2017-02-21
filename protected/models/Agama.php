@@ -279,7 +279,6 @@ class Agama extends CActiveRecord
 	 */
 	public static function getAgama($code=null) 
 	{
-		
 		$criteria=new CDbCriteria;		
 		$model = self::model()->findAll($criteria);
 

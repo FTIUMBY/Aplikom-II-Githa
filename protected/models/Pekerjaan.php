@@ -297,6 +297,33 @@ class Pekerjaan extends CActiveRecord
 	}
 
 	/**
+	 * Get Agama
+	 * 0 = unpublish
+	 * 1 = publish
+	 */
+	public static function getPekerjaan($status=null, $code=null) 
+	{
+		$criteria=new CDbCriteria;
+		if($status != null)
+			$criteria->compare('t.status',$status);			
+		$model = self::model()->findAll($criteria);
+
+		$items = array();
+		if($model != null) {
+			foreach($model as $key => $val) {
+				if($code != null)
+					$items[$val->pekerjaan_id] = $val->pekerjaan_name.' ('.$val->pekerjaan_code.')';
+				else
+					$items[$val->pekerjaan_id] = $val->pekerjaan_name;
+			}
+				
+			return $items;
+			
+		} else
+			return false;
+	}
+
+	/**
 	 * before validate attributes
 	 */
 	protected function beforeValidate() {
