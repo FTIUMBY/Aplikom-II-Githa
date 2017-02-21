@@ -3,12 +3,6 @@
  * Sekolah
  * version: 0.0.1
  *
- * @author Putra Sudaryanto <putra@sudaryanto.id>
- * @copyright Copyright (c) 2016 Ommu Platform (ommu.co)
- * @created date 21 February 2017, 06:48 WIB
- * @link http://company.ommu.co
- * @contact (+62)856-299-4114
- *
  * This is the template for generating the model class of a specified table.
  * - $this: the ModelCode object
  * - $tableName: the table name for this class (prefix is already removed if necessary)
@@ -39,6 +33,10 @@
 class Sekolah extends CActiveRecord
 {
 	public $defaultColumns = array();
+	
+	// Variable Search
+	public $creation_search;
+	public $modified_search;
 
 	/**
 	 * Returns the static model of the specified AR class.
@@ -67,14 +65,16 @@ class Sekolah extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('sekolah_name, sekolah_address, sekolah_phone, creation_date, creation_id, modified_id', 'required'),
+			array('sekolah_name', 'required'),
+			array('sekolah_address, sekolah_phone', 'required', 'on'=>'updateForm'),
 			array('status, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
 			array('sekolah_name', 'length', 'max'=>64),
 			array('sekolah_phone', 'length', 'max'=>15),
-			array('modified_date', 'safe'),
+			array('sekolah_address, sekolah_phone', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('kd_sekolah, status, sekolah_name, sekolah_address, sekolah_phone, creation_date, creation_id, modified_date, modified_id', 'safe', 'on'=>'search'),
+			array('kd_sekolah, status, sekolah_name, sekolah_address, sekolah_phone, creation_date, creation_id, modified_date, modified_id,
+				creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -87,6 +87,8 @@ class Sekolah extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'tblPegawais_relation' => array(self::HAS_MANY, 'TblPegawai', 'sekolah_id'),
+			'creation' => array(self::BELONGS_TO, 'User', 'creation_id'),
+			'modified' => array(self::BELONGS_TO, 'User', 'modified_id'),
 		);
 	}
 
@@ -105,6 +107,8 @@ class Sekolah extends CActiveRecord
 			'creation_id' => Yii::t('attribute', 'Creation'),
 			'modified_date' => Yii::t('attribute', 'Modified Date'),
 			'modified_id' => Yii::t('attribute', 'Modified'),
+			'creation_search' => Yii::t('attribute', 'Creation'),
+			'modified_search' => Yii::t('attribute', 'Modified'),
 		);
 		/*
 			'Kd Sekolah' => 'Kd Sekolah',
@@ -137,6 +141,18 @@ class Sekolah extends CActiveRecord
 		// @todo Please modify the following code to remove attributes that should not be searched.
 
 		$criteria=new CDbCriteria;
+		
+		// Custom Search
+		$criteria->with = array(
+			'creation' => array(
+				'alias'=>'creation',
+				'select'=>'displayname'
+			),
+			'modified' => array(
+				'alias'=>'modified',
+				'select'=>'displayname'
+			),
+		);
 
 		$criteria->compare('t.kd_sekolah',$this->kd_sekolah);
 		$criteria->compare('t.status',$this->status);
@@ -155,6 +171,9 @@ class Sekolah extends CActiveRecord
 			$criteria->compare('t.modified_id',$_GET['modified']);
 		else
 			$criteria->compare('t.modified_id',$this->modified_id);
+		
+		$criteria->compare('creation.displayname',strtolower($this->creation_search), true);
+		$criteria->compare('modified.displayname',strtolower($this->modified_search), true);
 
 		if(!isset($_GET['Sekolah_sort']))
 			$criteria->order = 't.kd_sekolah DESC';
@@ -216,23 +235,13 @@ class Sekolah extends CActiveRecord
 				'header' => 'No',
 				'value' => '$this->grid->dataProvider->pagination->currentPage*$this->grid->dataProvider->pagination->pageSize + $row+1'
 			);
-			if(!isset($_GET['type'])) {
-				$this->defaultColumns[] = array(
-					'name' => 'status',
-					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("status",array("id"=>$data->kd_sekolah)), $data->status, 1)',
-					'htmlOptions' => array(
-						'class' => 'center',
-					),
-					'filter'=>array(
-						1=>Yii::t('phrase', 'Yes'),
-						0=>Yii::t('phrase', 'No'),
-					),
-					'type' => 'raw',
-				);
-			}
 			$this->defaultColumns[] = 'sekolah_name';
 			$this->defaultColumns[] = 'sekolah_address';
 			$this->defaultColumns[] = 'sekolah_phone';
+			$this->defaultColumns[] = array(
+				'name' => 'creation_search',
+				'value' => '$data->creation->displayname',
+			);
 			$this->defaultColumns[] = array(
 				'name' => 'creation_date',
 				'value' => 'Utility::dateFormat($data->creation_date)',
@@ -259,34 +268,20 @@ class Sekolah extends CActiveRecord
 					),
 				), true),
 			);
-			$this->defaultColumns[] = 'creation_id';
-			$this->defaultColumns[] = array(
-				'name' => 'modified_date',
-				'value' => 'Utility::dateFormat($data->modified_date)',
-				'htmlOptions' => array(
-					'class' => 'center',
-				),
-				'filter' => Yii::app()->controller->widget('zii.widgets.jui.CJuiDatePicker', array(
-					'model'=>$this,
-					'attribute'=>'modified_date',
-					'language' => 'ja',
-					'i18nScriptFile' => 'jquery.ui.datepicker-en.js',
-					//'mode'=>'datetime',
+			if(!isset($_GET['type'])) {
+				$this->defaultColumns[] = array(
+					'name' => 'status',
+					'value' => 'Utility::getPublish(Yii::app()->controller->createUrl("status",array("id"=>$data->kd_sekolah)), $data->status, 1)',
 					'htmlOptions' => array(
-						'id' => 'modified_date_filter',
+						'class' => 'center',
 					),
-					'options'=>array(
-						'showOn' => 'focus',
-						'dateFormat' => 'dd-mm-yy',
-						'showOtherMonths' => true,
-						'selectOtherMonths' => true,
-						'changeMonth' => true,
-						'changeYear' => true,
-						'showButtonPanel' => true,
+					'filter'=>array(
+						1=>Yii::t('phrase', 'Yes'),
+						0=>Yii::t('phrase', 'No'),
 					),
-				), true),
-			);
-			$this->defaultColumns[] = 'modified_id';
+					'type' => 'raw',
+				);
+			}
 		}
 		parent::afterConstruct();
 	}
@@ -311,68 +306,14 @@ class Sekolah extends CActiveRecord
 	/**
 	 * before validate attributes
 	 */
-	/*
 	protected function beforeValidate() {
-		if(parent::beforeValidate()) {
-			// Create action
+		if(parent::beforeValidate()) {	
+			if($this->isNewRecord)
+				$this->creation_id = Yii::app()->user->id;			
+			else
+				$this->modified_id = Yii::app()->user->id;
 		}
 		return true;
 	}
-	*/
-
-	/**
-	 * after validate attributes
-	 */
-	/*
-	protected function afterValidate()
-	{
-		parent::afterValidate();
-			// Create action
-		return true;
-	}
-	*/
-	
-	/**
-	 * before save attributes
-	 */
-	/*
-	protected function beforeSave() {
-		if(parent::beforeSave()) {
-		}
-		return true;	
-	}
-	*/
-	
-	/**
-	 * After save attributes
-	 */
-	/*
-	protected function afterSave() {
-		parent::afterSave();
-		// Create action
-	}
-	*/
-
-	/**
-	 * Before delete attributes
-	 */
-	/*
-	protected function beforeDelete() {
-		if(parent::beforeDelete()) {
-			// Create action
-		}
-		return true;
-	}
-	*/
-
-	/**
-	 * After delete attributes
-	 */
-	/*
-	protected function afterDelete() {
-		parent::afterDelete();
-		// Create action
-	}
-	*/
 
 }

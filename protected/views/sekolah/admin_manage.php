@@ -5,12 +5,6 @@
  * @var $model Sekolah
  * version: 0.0.1
  *
- * @author Putra Sudaryanto <putra@sudaryanto.id>
- * @copyright Copyright (c) 2017 Ommu Platform (ommu.co)
- * @created date 21 February 2017, 06:48 WIB
- * @link http://company.ommu.co
- * @contect (+62)856-299-4114
- *
  */
 
 	$this->breadcrumbs=array(
@@ -74,10 +68,8 @@
 						'label' => 'view',
 						'options' => array(							
 							'class' => 'view',
-							'off_address' => '',
-							'target' => '_blank',
 						),
-						'url' => 'Yii::app()->controller->createUrl("site/view",array("id"=>$data->primaryKey))'),
+						'url' => 'Yii::app()->controller->createUrl("view",array("id"=>$data->primaryKey))'),
 					'update' => array(
 						'label' => 'update',
 						'options' => array(
