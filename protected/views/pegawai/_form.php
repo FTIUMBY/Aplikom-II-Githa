@@ -24,6 +24,15 @@
 <fieldset>
 
 	<div class="clearfix">
+		<?php echo $form->labelEx($model,'status'); ?>
+		<div class="desc">
+			<?php echo $form->checkBox($model,'status'); ?>
+			<?php echo $form->error($model,'status'); ?>
+			<?php /*<div class="small-px silent"></div>*/?>
+		</div>
+	</div>
+
+	<div class="clearfix">
 		<?php echo $form->labelEx($model,'NIP'); ?>
 		<div class="desc">
 			<?php echo $form->textField($model,'NIP',array('maxlength'=>5)); ?>
@@ -289,39 +298,12 @@
 
 <fieldset>
 	<h3><?php echo Yii::t('attribute', 'Keterangan Mengundurkan Diri');?></h3>
-	
-	<div class="clearfix">
-		<?php echo $form->labelEx($model,'tahun_ajar_id'); ?>
-		<div class="desc">
-			<?php echo $form->textField($model,'tahun_ajar_id'); ?>
-			<?php echo $form->error($model,'tahun_ajar_id'); ?>
-			<?php /*<div class="small-px silent"></div>*/?>
-		</div>
-	</div>
-
-	<div class="clearfix">
-		<?php echo $form->labelEx($model,'sekolah_id'); ?>
-		<div class="desc">
-			<?php echo $form->textField($model,'sekolah_id'); ?>
-			<?php echo $form->error($model,'sekolah_id'); ?>
-			<?php /*<div class="small-px silent"></div>*/?>
-		</div>
-	</div>
 
 	<div class="clearfix">
 		<?php echo $form->labelEx($model,'tahun_masuk'); ?>
 		<div class="desc">
 			<?php echo $form->textField($model,'tahun_masuk',array('maxlength'=>9)); ?>
 			<?php echo $form->error($model,'tahun_masuk'); ?>
-			<?php /*<div class="small-px silent"></div>*/?>
-		</div>
-	</div>
-
-	<div class="clearfix">
-		<?php echo $form->labelEx($model,'status'); ?>
-		<div class="desc">
-			<?php echo $form->checkBox($model,'status'); ?>
-			<?php echo $form->error($model,'status'); ?>
 			<?php /*<div class="small-px silent"></div>*/?>
 		</div>
 	</div>

@@ -22,8 +22,6 @@
  * @property string $NPSN
  * @property string $NIK
  * @property integer $status
- * @property integer $tahun_ajar_id
- * @property integer $sekolah_id
  * @property integer $agama_id
  * @property string $nama
  * @property string $gender
@@ -96,8 +94,8 @@ class Pegawai extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('NIP, NPSN, NIK, tahun_ajar_id, sekolah_id, agama_id, nama, gender, tempat_lahir, tgl_lahir, alamat, jumlah_saudara, anak_ke, tahun_masuk, gambar, panggilan, kewarganegaraan_pegawai, saudara_tiri, saudara_angkat, bahasa, tinggal_dengan, jarak, transportasi, gol_darah, penyakit, kelainan_jasmani, tinggi, berat, no_telp', 'required'),
-			array('status, tahun_ajar_id, sekolah_id, agama_id, jumlah_saudara, anak_ke, saudara_tiri, saudara_angkat, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
+			array('NIP, NPSN, NIK, agama_id, nama, gender, tempat_lahir, tgl_lahir, alamat, jumlah_saudara, anak_ke, tahun_masuk, gambar, panggilan, kewarganegaraan_pegawai, saudara_tiri, saudara_angkat, bahasa, tinggal_dengan, jarak, transportasi, gol_darah, penyakit, kelainan_jasmani, tinggi, berat, no_telp', 'required'),
+			array('status, agama_id, jumlah_saudara, anak_ke, saudara_tiri, saudara_angkat, creation_id, modified_id', 'numerical', 'integerOnly'=>true),
 			array('gender, gol_darah', 'length', 'max'=>1),
 			array('jarak', 'length', 'max'=>2),
 			array('kewarganegaraan_pegawai, tinggi, berat', 'length', 'max'=>3),
@@ -111,7 +109,7 @@ class Pegawai extends CActiveRecord
 			array('', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('pegawai_id, NIP, NPSN, NIK, status, tahun_ajar_id, sekolah_id, agama_id, nama, gender, tempat_lahir, tgl_lahir, alamat, jumlah_saudara, anak_ke, tahun_masuk, gambar, panggilan, kewarganegaraan_pegawai, saudara_tiri, saudara_angkat, bahasa, tinggal_dengan, jarak, transportasi, gol_darah, penyakit, kelainan_jasmani, tinggi, berat, no_telp, creation_date, creation_id, modified_date, modified_id,
+			array('pegawai_id, NIP, NPSN, NIK, status, agama_id, nama, gender, tempat_lahir, tgl_lahir, alamat, jumlah_saudara, anak_ke, tahun_masuk, gambar, panggilan, kewarganegaraan_pegawai, saudara_tiri, saudara_angkat, bahasa, tinggal_dengan, jarak, transportasi, gol_darah, penyakit, kelainan_jasmani, tinggi, berat, no_telp, creation_date, creation_id, modified_date, modified_id,
 				creation_search, modified_search', 'safe', 'on'=>'search'),
 		);
 	}
@@ -125,8 +123,6 @@ class Pegawai extends CActiveRecord
 		// class name for the relations automatically generated below.
 		return array(
 			'agama' => array(self::BELONGS_TO, 'Agama', 'agama_id'),
-			'tahunajar' => array(self::BELONGS_TO, 'TahunAjar', 'tahun_ajar_id'),
-			'sekolah' => array(self::BELONGS_TO, 'Sekolah', 'sekolah_id'),
 			'creation' => array(self::BELONGS_TO, 'User', 'creation_id'),
 			'modified' => array(self::BELONGS_TO, 'User', 'modified_id'),
 			'ibus' => array(self::HAS_MANY, 'Ibu', 'pegawai_id'),
@@ -146,8 +142,6 @@ class Pegawai extends CActiveRecord
 			'NPSN' => Yii::t('attribute', 'NPSN'),
 			'NIK' => Yii::t('attribute', 'NIK'),
 			'status' => Yii::t('attribute', 'Status'),
-			'tahun_ajar_id' => Yii::t('attribute', 'Tahun Ajar'),
-			'sekolah_id' => Yii::t('attribute', 'Sekolah'),
 			'agama_id' => Yii::t('attribute', 'Agama'),
 			'nama' => Yii::t('attribute', 'Nama'),
 			'gender' => Yii::t('attribute', 'Gender'),
@@ -251,14 +245,6 @@ class Pegawai extends CActiveRecord
 		$criteria->compare('t.NPSN',strtolower($this->NPSN),true);
 		$criteria->compare('t.NIK',strtolower($this->NIK),true);
 		$criteria->compare('t.status',$this->status);
-		if(isset($_GET['tahun']))
-			$criteria->compare('t.tahun_ajar_id',$_GET['tahun']);
-		else
-			$criteria->compare('t.tahun_ajar_id',$this->tahun_ajar_id);
-		if(isset($_GET['sekolah']))
-			$criteria->compare('t.sekolah_id',$_GET['sekolah']);
-		else
-			$criteria->compare('t.sekolah_id',$this->sekolah_id);
 		if(isset($_GET['agama']))
 			$criteria->compare('t.agama_id',$_GET['agama']);
 		else
@@ -325,8 +311,6 @@ class Pegawai extends CActiveRecord
 			$this->defaultColumns[] = 'NPSN';
 			$this->defaultColumns[] = 'NIK';
 			$this->defaultColumns[] = 'status';
-			$this->defaultColumns[] = 'tahun_ajar_id';
-			$this->defaultColumns[] = 'sekolah_id';
 			$this->defaultColumns[] = 'agama_id';
 			$this->defaultColumns[] = 'nama';
 			$this->defaultColumns[] = 'gender';
@@ -380,8 +364,6 @@ class Pegawai extends CActiveRecord
 			$this->defaultColumns[] = 'NIP';
 			$this->defaultColumns[] = 'NPSN';
 			$this->defaultColumns[] = 'NIK';
-			$this->defaultColumns[] = 'tahun_ajar_id';
-			$this->defaultColumns[] = 'sekolah_id';
 			$this->defaultColumns[] = 'agama_id';
 			$this->defaultColumns[] = 'nama';
 			$this->defaultColumns[] = 'gender';

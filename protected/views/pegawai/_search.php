@@ -40,16 +40,6 @@
 		</li>
 
 		<li>
-			<?php echo $model->getAttributeLabel('tahun_ajar_id'); ?><br/>
-			<?php echo $form->textField($model,'tahun_ajar_id'); ?>
-		</li>
-
-		<li>
-			<?php echo $model->getAttributeLabel('sekolah_id'); ?><br/>
-			<?php echo $form->textField($model,'sekolah_id'); ?>
-		</li>
-
-		<li>
 			<?php echo $model->getAttributeLabel('agama_id'); ?><br/>
 			<?php echo $form->textField($model,'agama_id'); ?>
 		</li>
